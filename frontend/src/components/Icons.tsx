@@ -171,3 +171,11 @@ export const IconInfo: React.FC<IconProps> = ({ size = 18, strokeWidth = 2, colo
     <line x1="12" y1="8" x2="12.01" y2="8" />
   </svg>
 )
+
+export const IconMenu: React.FC<IconProps> = ({ size = 20, strokeWidth = 2, color = 'currentColor', className }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <line x1="3" y1="12" x2="21" y2="12" />
+    <line x1="3" y1="6" x2="21" y2="6" />
+    <line x1="3" y1="18" x2="21" y2="18" />
+  </svg>
+)
