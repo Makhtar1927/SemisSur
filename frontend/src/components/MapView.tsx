@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect, useRef } from 'react'
+import L from 'leaflet'
 import type { SectorResult, SectorsGeoJson, RainRecord, NdviRecord, NdviRefRecord } from '../lib/schemas'
 import { SectorDrawer } from './SectorDrawer'
 import {
@@ -7,10 +8,8 @@ import {
   IconCheck,
   IconMap,
   IconGrid,
-  IconSatellite,
   IconRain,
-  IconLeaf,
-  IconInfo,
+  IconSatellite,
 } from './Icons'
 
 interface MapViewProps {
@@ -34,8 +33,12 @@ export const MapView: React.FC<MapViewProps> = ({
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [viewMode, setViewMode] = useState<'carte' | 'grille'>('carte')
-  const [hoveredSector, setHoveredSector] = useState<SectorResult | null>(null)
-  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null)
+  const [tileLayerType, setTileLayerType] = useState<'satellite' | 'osm'>('satellite')
+
+  const mapContainerRef = useRef<HTMLDivElement>(null)
+  const leafletMapRef = useRef<L.Map | null>(null)
+  const geojsonLayerRef = useRef<L.GeoJSON | null>(null)
+  const tileLayerRef = useRef<L.TileLayer | null>(null)
 
   // Map results to sectorId
   const resultsBySector = useMemo(() => {
@@ -89,39 +92,166 @@ export const MapView: React.FC<MapViewProps> = ({
     return resultsBySector.get(selectedSectorId) || null
   }, [selectedSectorId, resultsBySector])
 
-  // Project GeoJSON Polygons into SVG Paths
-  const svgPolygons = useMemo(() => {
-    if (!sectorsGeoJson) return []
+  // Initialize Leaflet Map with real Satellite and Geographic Base Maps
+  useEffect(() => {
+    if (!mapContainerRef.current || leafletMapRef.current) return
 
-    const minLon = -15.630
-    const maxLon = -15.470
-    const minLat = 14.030
-    const maxLat = 14.180
-
-    const width = 800
-    const height = 620
-    const pad = 40
-
-    return sectorsGeoJson.features.map((feat) => {
-      const res = resultsBySector.get(feat.id as string)
-      const coords = (feat.geometry.coordinates[0] as number[][]) || []
-
-      const pathData = coords
-        .map(([lon, lat], idx) => {
-          const x = pad + ((lon - minLon) / (maxLon - minLon)) * (width - 2 * pad)
-          const y = height - pad - ((lat - minLat) / (maxLat - minLat)) * (height - 2 * pad)
-          return `${idx === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`
-        })
-        .join(' ') + ' Z'
-
-      return {
-        id: feat.id as string,
-        path: pathData,
-        res,
-        properties: feat.properties,
-      }
+    // Center on Kaffrine / Bassin Arachidier (Lat: 14.105, Lon: -15.550)
+    const map = L.map(mapContainerRef.current, {
+      center: [14.105, -15.550],
+      zoom: 11,
+      minZoom: 6,
+      maxZoom: 18,
+      zoomControl: true,
     })
-  }, [sectorsGeoJson, resultsBySector])
+
+    // Add Esri World Imagery (Real High-Res Satellite View of Senegal)
+    const satelliteTile = L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      {
+        attribution: 'Tiles &copy; Esri, Maxar, Earthstar Geographics, USDA, USGS, AeroGRID, IGN, and the GIS User Community',
+        maxZoom: 18,
+      }
+    )
+
+    satelliteTile.addTo(map)
+    tileLayerRef.current = satelliteTile
+    leafletMapRef.current = map
+
+    return () => {
+      map.remove()
+      leafletMapRef.current = null
+      tileLayerRef.current = null
+      geojsonLayerRef.current = null
+    }
+  }, [])
+
+  // Switch Tile Base Layer (Satellite vs OpenStreetMap)
+  useEffect(() => {
+    if (!leafletMapRef.current) return
+
+    if (tileLayerRef.current) {
+      leafletMapRef.current.removeLayer(tileLayerRef.current)
+    }
+
+    if (tileLayerType === 'satellite') {
+      tileLayerRef.current = L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        {
+          attribution: 'Tiles &copy; Esri & Copernicus • Bassin arachidier',
+          maxZoom: 18,
+        }
+      ).addTo(leafletMapRef.current)
+    } else {
+      tileLayerRef.current = L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {
+          attribution: '&copy; OpenStreetMap contributors • Sénégal',
+          maxZoom: 18,
+        }
+      ).addTo(leafletMapRef.current)
+    }
+  }, [tileLayerType])
+
+  // Update GeoJSON Polygons layer whenever sectorsGeoJson, results, or filters change
+  useEffect(() => {
+    if (!leafletMapRef.current || !sectorsGeoJson) return
+
+    // Remove existing geojson layer if present
+    if (geojsonLayerRef.current) {
+      leafletMapRef.current.removeLayer(geojsonLayerRef.current)
+      geojsonLayerRef.current = null
+    }
+
+    const geoLayer = L.geoJSON(sectorsGeoJson as any, {
+      style: (feature) => {
+        if (!feature) return {}
+        const secId = feature.id as string
+        const res = resultsBySector.get(secId)
+        const statut = res?.statut || 'non_evalue'
+
+        const isProbable = statut === 'signature_probable'
+        const isExamine = statut === 'baisse_a_examiner'
+        const isNormal = statut === 'pas_de_signature'
+
+        const fillColor = isProbable
+          ? '#D97706'
+          : isExamine
+          ? '#EA580C'
+          : isNormal
+          ? '#15803D'
+          : '#64748B'
+
+        const isSelected = selectedSectorId === secId
+        const isFiltered =
+          statusFilter === 'all'
+            ? true
+            : statut === statusFilter
+
+        return {
+          fillColor: fillColor,
+          weight: isSelected ? 3 : 1.5,
+          opacity: isFiltered ? 0.9 : 0.2,
+          color: isSelected ? '#FFFFFF' : 'rgba(255, 255, 255, 0.75)',
+          fillOpacity: isFiltered ? (isSelected ? 0.75 : 0.5) : 0.1,
+        }
+      },
+      onEachFeature: (feature, layer) => {
+        const secId = feature.id as string
+        const res = resultsBySector.get(secId)
+        if (!res) return
+
+        // Tooltip content
+        const tooltipHtml = `
+          <div style="font-family: 'Outfit', sans-serif; font-size: 12px; line-height: 1.4; padding: 2px;">
+            <strong style="color: #164E31; font-size: 13px;">${res.nom}</strong><br/>
+            <span>Commune : <strong>${res.commune}</strong></span><br/>
+            <span>Semis : <strong>${res.season_start_date || 'Non détecté'}</strong></span><br/>
+            <span>Séquence sèche : <strong>${res.max_dry_days} j</strong></span><br/>
+            <span style="font-weight: 600; color: ${res.statut === 'signature_probable' ? '#D97706' : '#15803D'}">
+              ${res.statut === 'signature_probable' ? '⚠️ Faux départ' : '✅ Normal'}
+            </span>
+          </div>
+        `
+        layer.bindTooltip(tooltipHtml, { sticky: true, opacity: 0.95 })
+
+        // Interaction handlers
+        layer.on({
+          mouseover: (e) => {
+            const target = e.target
+            target.setStyle({
+              weight: 3,
+              color: '#FFFFFF',
+              fillOpacity: 0.8,
+            })
+            target.bringToFront()
+          },
+          mouseout: (e) => {
+            geoLayer.resetStyle(e.target)
+          },
+          click: () => {
+            setSelectedSectorId(secId)
+          },
+        })
+      },
+    })
+
+    geoLayer.addTo(leafletMapRef.current)
+    geojsonLayerRef.current = geoLayer
+  }, [sectorsGeoJson, resultsBySector, selectedSectorId, statusFilter])
+
+  // Center Map on Kaffrine or Whole Senegal
+  const handleZoomKaffrine = () => {
+    if (leafletMapRef.current) {
+      leafletMapRef.current.setView([14.105, -15.550], 11)
+    }
+  }
+
+  const handleZoomSenegal = () => {
+    if (leafletMapRef.current) {
+      leafletMapRef.current.setView([14.497, -14.452], 7)
+    }
+  }
 
   return (
     <div className="page-container">
@@ -264,150 +394,107 @@ export const MapView: React.FC<MapViewProps> = ({
           className="map-wrapper"
           style={{
             position: 'relative',
-            height: '620px',
+            height: '640px',
             borderRadius: '16px',
             overflow: 'hidden',
             border: '1px solid var(--border)',
-            background: 'var(--bg-subtle)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            boxShadow: 'var(--shadow-card)',
           }}
         >
-          {/* SVG Vector Choropleth Map */}
-          <svg
-            viewBox="0 0 800 620"
-            style={{ width: '100%', height: '100%' }}
+          {/* Real Leaflet Map Container */}
+          <div
+            ref={mapContainerRef}
+            style={{ width: '100%', height: '100%', zIndex: 1 }}
+          />
+
+          {/* Floating Top Controls Bar (Layer & Zoom Switcher) */}
+          <div
+            style={{
+              position: 'absolute',
+              top: '15px',
+              right: '15px',
+              zIndex: 500,
+              display: 'flex',
+              gap: '0.5rem',
+              flexWrap: 'wrap',
+            }}
           >
-            {/* Background Subtly Textured Grid */}
-            <defs>
-              <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(22, 78, 49, 0.04)" strokeWidth="1" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#grid)" />
-
-            {/* Sectors Polygons */}
-            {svgPolygons.map(({ id, path, res }) => {
-              const isSelected = selectedSectorId === id
-              const isProbable = res?.statut === 'signature_probable'
-              const isExamine = res?.statut === 'baisse_a_examiner'
-              const isNormal = res?.statut === 'pas_de_signature'
-
-              const fillColor = isProbable
-                ? '#D97706'
-                : isExamine
-                ? '#EA580C'
-                : isNormal
-                ? '#15803D'
-                : '#64748B'
-
-              const opacity =
-                statusFilter === 'all'
-                  ? 0.78
-                  : res?.statut === statusFilter
-                  ? 0.92
-                  : 0.15
-
-              return (
-                <path
-                  key={id}
-                  d={path}
-                  fill={fillColor}
-                  fillOpacity={opacity}
-                  stroke={isSelected ? '#0F172A' : '#FFFFFF'}
-                  strokeWidth={isSelected ? 2.8 : 1}
-                  style={{
-                    cursor: 'pointer',
-                    transition: 'all 150ms ease',
-                  }}
-                  onMouseEnter={(e) => {
-                    if (res) {
-                      setHoveredSector(res)
-                      setTooltipPos({ x: e.clientX, y: e.clientY })
-                    }
-                  }}
-                  onMouseMove={(e) => {
-                    setTooltipPos({ x: e.clientX, y: e.clientY })
-                  }}
-                  onMouseLeave={() => {
-                    setHoveredSector(null)
-                  }}
-                  onClick={() => setSelectedSectorId(id)}
-                />
-              )
-            })}
-          </svg>
-
-          {/* Floating Hover Tooltip */}
-          {hoveredSector && tooltipPos && (
-            <div
-              style={{
-                position: 'fixed',
-                top: tooltipPos.y - 110,
-                left: tooltipPos.x + 15,
-                zIndex: 1000,
-                background: 'rgba(15, 23, 42, 0.95)',
-                color: '#FFFFFF',
-                padding: '0.65rem 0.9rem',
-                borderRadius: '8px',
-                pointerEvents: 'none',
-                boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
-                fontSize: '0.82rem',
-                lineHeight: '1.4',
-                maxWidth: '240px',
-              }}
-            >
-              <div style={{ fontWeight: 700, fontSize: '0.88rem', color: '#8FD18A', marginBottom: '0.2rem' }}>
-                {hoveredSector.nom}
-              </div>
-              <div>Commune : <strong>{hoveredSector.commune}</strong></div>
-              <div>Semis : <strong>{hoveredSector.season_start_date || 'Non détecté'}</strong></div>
-              <div>Séquence sèche : <strong>{hoveredSector.max_dry_days} jours</strong></div>
-              <div style={{ marginTop: '0.35rem', paddingTop: '0.35rem', borderTop: '1px solid rgba(255,255,255,0.2)', fontSize: '0.74rem', color: '#E8B04A' }}>
-                Cliquer pour ouvrir la fiche détaillée
-              </div>
+            {/* Tile Layer Switcher */}
+            <div style={{ background: 'var(--bg-card)', padding: '0.25rem', borderRadius: '8px', border: '1px solid var(--border)', display: 'flex', gap: '0.25rem', boxShadow: 'var(--shadow-card)' }}>
+              <button
+                className={`btn btn--sm ${tileLayerType === 'satellite' ? 'btn--primary' : 'btn--secondary'}`}
+                onClick={() => setTileLayerType('satellite')}
+                style={{ padding: '0.35rem 0.75rem', fontSize: '0.78rem' }}
+              >
+                <IconSatellite size={13} />
+                <span>Satellite Naturel</span>
+              </button>
+              <button
+                className={`btn btn--sm ${tileLayerType === 'osm' ? 'btn--primary' : 'btn--secondary'}`}
+                onClick={() => setTileLayerType('osm')}
+                style={{ padding: '0.35rem 0.75rem', fontSize: '0.78rem' }}
+              >
+                <IconMap size={13} />
+                <span>Carte & Villes</span>
+              </button>
             </div>
-          )}
 
-          {/* Floating Legend */}
+            {/* Quick Geo Zoom Buttons */}
+            <div style={{ background: 'var(--bg-card)', padding: '0.25rem', borderRadius: '8px', border: '1px solid var(--border)', display: 'flex', gap: '0.25rem', boxShadow: 'var(--shadow-card)' }}>
+              <button
+                className="btn btn--secondary btn--sm"
+                onClick={handleZoomKaffrine}
+                title="Recentrer sur la zone Kaffrine"
+                style={{ padding: '0.35rem 0.75rem', fontSize: '0.78rem' }}
+              >
+                🎯 Kaffrine
+              </button>
+              <button
+                className="btn btn--secondary btn--sm"
+                onClick={handleZoomSenegal}
+                title="Vue d'ensemble Sénégal"
+                style={{ padding: '0.35rem 0.75rem', fontSize: '0.78rem' }}
+              >
+                🇸🇳 Sénégal
+              </button>
+            </div>
+          </div>
+
+          {/* Floating Legend Bottom Left */}
           <div
             className="card floating-legend"
             style={{
               position: 'absolute',
-              bottom: '18px',
-              left: '18px',
-              zIndex: 10,
-              maxWidth: '300px',
-              padding: '0.85rem 1rem',
+              bottom: '22px',
+              left: '22px',
+              zIndex: 500,
+              maxWidth: '320px',
+              padding: '0.85rem 1.1rem',
               background: 'var(--bg-card)',
               boxShadow: 'var(--shadow-card)',
+              border: '1px solid var(--border)',
             }}
           >
-            <div style={{ fontWeight: 700, fontSize: '0.82rem', marginBottom: '0.5rem', color: 'var(--clr-vert-semis)' }}>
-              {wolofMode ? 'Melokaanoo yi' : 'Statut de la Campagne'}
+            <div style={{ fontWeight: 700, fontSize: '0.84rem', marginBottom: '0.5rem', color: 'var(--clr-vert-semis)' }}>
+              {wolofMode ? 'Melokaanoo yi' : 'Couche SemisSûr • Bassin Arachidier'}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', fontSize: '0.76rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <span style={{ width: '12px', height: '12px', borderRadius: '3px', background: '#15803D', display: 'inline-block' }} />
-                <span>Semis normal (aucun faux départ)</span>
+                <span>Semis normal (aucune pause critique)</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <span style={{ width: '12px', height: '12px', borderRadius: '3px', background: '#D97706', display: 'inline-block' }} />
-                <span>Faux départ probable (pause hydrique ≥ 8j)</span>
+                <span>Faux départ probable (pause sèche ≥ 8j)</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <span style={{ width: '12px', height: '12px', borderRadius: '3px', background: '#EA580C', display: 'inline-block' }} />
                 <span>Baisse NDVI à examiner</span>
               </div>
             </div>
-          </div>
-
-          {/* Map Controls */}
-          <div style={{ position: 'absolute', top: '15px', right: '15px', zIndex: 10 }}>
-            <span className="badge badge--real" style={{ background: 'var(--bg-card)' }}>
-              Bassin arachidier • 100 Secteurs
-            </span>
+            <div style={{ marginTop: '0.5rem', paddingTop: '0.45rem', borderTop: '1px solid var(--border)', fontSize: '0.72rem', color: 'var(--fg-muted)' }}>
+              Survol pour inspecter • Clic pour ouvrir la fiche
+            </div>
           </div>
         </div>
       ) : (
