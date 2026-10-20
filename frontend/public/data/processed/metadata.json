@@ -1,0 +1,56 @@
+{
+  "generated_at": "2026-10-20T13:38:30.411483",
+  "project": "SemisSûr",
+  "zone": "Bassin arachidier - Région de Kaffrine",
+  "bbox": {
+    "min_lon": -15.63,
+    "min_lat": 14.03,
+    "max_lon": -15.47,
+    "max_lat": 14.18
+  },
+  "season_year": 2026,
+  "thresholds": {
+    "rain": {
+      "start_search_day": "06-01",
+      "accum_days": 3,
+      "trigger_accum_mm": 20.0,
+      "dry_spell_window_days": 30,
+      "dry_day_max_rain_mm": 1.0,
+      "dry_spell_min_duration_days": 8
+    },
+    "ndvi": {
+      "peak_window_days": 25,
+      "trough_window_days": 30,
+      "relative_drop_min": 0.15,
+      "recovery_abs_min": 0.05,
+      "recovery_window_days": 40
+    }
+  },
+  "sources": [
+    {
+      "produit": "CHIRPS Daily",
+      "version": "2.0",
+      "fournisseur": "UC Santa Barbara",
+      "resolution": "0.05°",
+      "licence": "Domaine public",
+      "date_consultation": "2026-10-20"
+    },
+    {
+      "produit": "Sentinel-2 L2A",
+      "version": "S2_SR_HARMONIZED",
+      "fournisseur": "ESA",
+      "resolution": "10 m",
+      "licence": "Copernicus Open Access",
+      "date_consultation": "2026-10-20"
+    },
+    {
+      "produit": "ESA WorldCover 2021",
+      "version": "v200",
+      "fournisseur": "ESA",
+      "resolution": "10 m",
+      "licence": "CC BY 4.0",
+      "date_consultation": "2026-10-20"
+    }
+  ],
+  "avertissement": "Les valeurs NDVI sont des signaux à vérifier sur place. Elles n'impliquent ni cause, ni rendement, ni perte prouvée. Les seuils sont des hypothèses à calibrer par des données de terrain."
+}

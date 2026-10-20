@@ -1,0 +1,258 @@
+{
+  "grid": [
+    {
+      "rain_trigger_mm": 15.0,
+      "dry_spell_days": 6,
+      "ndvi_drop_min": 0.1,
+      "n_sectors_signaled": 72,
+      "pct_sectors_signaled": 52.6
+    },
+    {
+      "rain_trigger_mm": 15.0,
+      "dry_spell_days": 6,
+      "ndvi_drop_min": 0.15,
+      "n_sectors_signaled": 45,
+      "pct_sectors_signaled": 32.8
+    },
+    {
+      "rain_trigger_mm": 15.0,
+      "dry_spell_days": 6,
+      "ndvi_drop_min": 0.2,
+      "n_sectors_signaled": 24,
+      "pct_sectors_signaled": 17.5
+    },
+    {
+      "rain_trigger_mm": 15.0,
+      "dry_spell_days": 8,
+      "ndvi_drop_min": 0.1,
+      "n_sectors_signaled": 72,
+      "pct_sectors_signaled": 52.6
+    },
+    {
+      "rain_trigger_mm": 15.0,
+      "dry_spell_days": 8,
+      "ndvi_drop_min": 0.15,
+      "n_sectors_signaled": 45,
+      "pct_sectors_signaled": 32.8
+    },
+    {
+      "rain_trigger_mm": 15.0,
+      "dry_spell_days": 8,
+      "ndvi_drop_min": 0.2,
+      "n_sectors_signaled": 24,
+      "pct_sectors_signaled": 17.5
+    },
+    {
+      "rain_trigger_mm": 15.0,
+      "dry_spell_days": 10,
+      "ndvi_drop_min": 0.1,
+      "n_sectors_signaled": 72,
+      "pct_sectors_signaled": 52.6
+    },
+    {
+      "rain_trigger_mm": 15.0,
+      "dry_spell_days": 10,
+      "ndvi_drop_min": 0.15,
+      "n_sectors_signaled": 45,
+      "pct_sectors_signaled": 32.8
+    },
+    {
+      "rain_trigger_mm": 15.0,
+      "dry_spell_days": 10,
+      "ndvi_drop_min": 0.2,
+      "n_sectors_signaled": 24,
+      "pct_sectors_signaled": 17.5
+    },
+    {
+      "rain_trigger_mm": 15.0,
+      "dry_spell_days": 12,
+      "ndvi_drop_min": 0.1,
+      "n_sectors_signaled": 72,
+      "pct_sectors_signaled": 52.6
+    },
+    {
+      "rain_trigger_mm": 15.0,
+      "dry_spell_days": 12,
+      "ndvi_drop_min": 0.15,
+      "n_sectors_signaled": 45,
+      "pct_sectors_signaled": 32.8
+    },
+    {
+      "rain_trigger_mm": 15.0,
+      "dry_spell_days": 12,
+      "ndvi_drop_min": 0.2,
+      "n_sectors_signaled": 24,
+      "pct_sectors_signaled": 17.5
+    },
+    {
+      "rain_trigger_mm": 20.0,
+      "dry_spell_days": 6,
+      "ndvi_drop_min": 0.1,
+      "n_sectors_signaled": 72,
+      "pct_sectors_signaled": 52.6
+    },
+    {
+      "rain_trigger_mm": 20.0,
+      "dry_spell_days": 6,
+      "ndvi_drop_min": 0.15,
+      "n_sectors_signaled": 45,
+      "pct_sectors_signaled": 32.8
+    },
+    {
+      "rain_trigger_mm": 20.0,
+      "dry_spell_days": 6,
+      "ndvi_drop_min": 0.2,
+      "n_sectors_signaled": 24,
+      "pct_sectors_signaled": 17.5
+    },
+    {
+      "rain_trigger_mm": 20.0,
+      "dry_spell_days": 8,
+      "ndvi_drop_min": 0.1,
+      "n_sectors_signaled": 72,
+      "pct_sectors_signaled": 52.6
+    },
+    {
+      "rain_trigger_mm": 20.0,
+      "dry_spell_days": 8,
+      "ndvi_drop_min": 0.15,
+      "n_sectors_signaled": 45,
+      "pct_sectors_signaled": 32.8
+    },
+    {
+      "rain_trigger_mm": 20.0,
+      "dry_spell_days": 8,
+      "ndvi_drop_min": 0.2,
+      "n_sectors_signaled": 24,
+      "pct_sectors_signaled": 17.5
+    },
+    {
+      "rain_trigger_mm": 20.0,
+      "dry_spell_days": 10,
+      "ndvi_drop_min": 0.1,
+      "n_sectors_signaled": 72,
+      "pct_sectors_signaled": 52.6
+    },
+    {
+      "rain_trigger_mm": 20.0,
+      "dry_spell_days": 10,
+      "ndvi_drop_min": 0.15,
+      "n_sectors_signaled": 45,
+      "pct_sectors_signaled": 32.8
+    },
+    {
+      "rain_trigger_mm": 20.0,
+      "dry_spell_days": 10,
+      "ndvi_drop_min": 0.2,
+      "n_sectors_signaled": 24,
+      "pct_sectors_signaled": 17.5
+    },
+    {
+      "rain_trigger_mm": 20.0,
+      "dry_spell_days": 12,
+      "ndvi_drop_min": 0.1,
+      "n_sectors_signaled": 72,
+      "pct_sectors_signaled": 52.6
+    },
+    {
+      "rain_trigger_mm": 20.0,
+      "dry_spell_days": 12,
+      "ndvi_drop_min": 0.15,
+      "n_sectors_signaled": 45,
+      "pct_sectors_signaled": 32.8
+    },
+    {
+      "rain_trigger_mm": 20.0,
+      "dry_spell_days": 12,
+      "ndvi_drop_min": 0.2,
+      "n_sectors_signaled": 24,
+      "pct_sectors_signaled": 17.5
+    },
+    {
+      "rain_trigger_mm": 25.0,
+      "dry_spell_days": 6,
+      "ndvi_drop_min": 0.1,
+      "n_sectors_signaled": 72,
+      "pct_sectors_signaled": 52.6
+    },
+    {
+      "rain_trigger_mm": 25.0,
+      "dry_spell_days": 6,
+      "ndvi_drop_min": 0.15,
+      "n_sectors_signaled": 45,
+      "pct_sectors_signaled": 32.8
+    },
+    {
+      "rain_trigger_mm": 25.0,
+      "dry_spell_days": 6,
+      "ndvi_drop_min": 0.2,
+      "n_sectors_signaled": 24,
+      "pct_sectors_signaled": 17.5
+    },
+    {
+      "rain_trigger_mm": 25.0,
+      "dry_spell_days": 8,
+      "ndvi_drop_min": 0.1,
+      "n_sectors_signaled": 72,
+      "pct_sectors_signaled": 52.6
+    },
+    {
+      "rain_trigger_mm": 25.0,
+      "dry_spell_days": 8,
+      "ndvi_drop_min": 0.15,
+      "n_sectors_signaled": 45,
+      "pct_sectors_signaled": 32.8
+    },
+    {
+      "rain_trigger_mm": 25.0,
+      "dry_spell_days": 8,
+      "ndvi_drop_min": 0.2,
+      "n_sectors_signaled": 24,
+      "pct_sectors_signaled": 17.5
+    },
+    {
+      "rain_trigger_mm": 25.0,
+      "dry_spell_days": 10,
+      "ndvi_drop_min": 0.1,
+      "n_sectors_signaled": 72,
+      "pct_sectors_signaled": 52.6
+    },
+    {
+      "rain_trigger_mm": 25.0,
+      "dry_spell_days": 10,
+      "ndvi_drop_min": 0.15,
+      "n_sectors_signaled": 45,
+      "pct_sectors_signaled": 32.8
+    },
+    {
+      "rain_trigger_mm": 25.0,
+      "dry_spell_days": 10,
+      "ndvi_drop_min": 0.2,
+      "n_sectors_signaled": 24,
+      "pct_sectors_signaled": 17.5
+    },
+    {
+      "rain_trigger_mm": 25.0,
+      "dry_spell_days": 12,
+      "ndvi_drop_min": 0.1,
+      "n_sectors_signaled": 72,
+      "pct_sectors_signaled": 52.6
+    },
+    {
+      "rain_trigger_mm": 25.0,
+      "dry_spell_days": 12,
+      "ndvi_drop_min": 0.15,
+      "n_sectors_signaled": 45,
+      "pct_sectors_signaled": 32.8
+    },
+    {
+      "rain_trigger_mm": 25.0,
+      "dry_spell_days": 12,
+      "ndvi_drop_min": 0.2,
+      "n_sectors_signaled": 24,
+      "pct_sectors_signaled": 17.5
+    }
+  ],
+  "n_sectors_total": 137,
+  "generated_at": "2026-10-20T13:38:30.396399"
+}

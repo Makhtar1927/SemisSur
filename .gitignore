@@ -1,0 +1,26 @@
+# Environnement Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+.pytest_cache/
+
+# Données volumineuses brutes (à télécharger séparément via script ou lien)
+data/raw/chirps/*
+data/raw/s2/*
+data/raw/worldcover/*
+data/raw/admin/*
+data/raw/osm/*
+data/raw/anacim/*
+!data/raw/**/.gitkeep
+
+# Garder data/processed/ tracé pour l'application statique
+!data/processed/
+
+# Node / Frontend
+node_modules/
+dist/
+.DS_Store
+Thumbs.db

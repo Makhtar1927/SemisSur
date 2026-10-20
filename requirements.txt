@@ -1,0 +1,14 @@
+# Dépendances de SemisSûr
+numpy>=1.26.0
+pandas>=2.2.0
+scipy>=1.12.0
+pyyaml>=6.0.0
+requests>=2.31.0
+shapely>=2.0.0
+geopandas>=1.0.0
+pyogrio>=0.10.0
+pystac-client>=0.8.0
+pytest>=8.0.0
+tqdm>=4.66.0
+# Optionnel selon l'accès Earth Engine :
+# earthengine-api>=0.1.390

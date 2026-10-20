@@ -1,0 +1,70 @@
+# Configuration du projet SemisSûr
+# Hackathon "Du satellite à la solution" (SENSAT & TRL Space, Sénégal)
+
+project:
+  name: "SemisSûr"
+  tagline: "Prévenir. Constater. Réparer."
+  zone_name: "Bassin arachidier - Région de Kaffrine"
+  bbox:
+    # [min_lon, min_lat, max_lon, max_lat] (environ 16 km x 16 km autour de Kaffrine)
+    min_lon: -15.630
+    min_lat: 14.030
+    max_lon: -15.470
+    max_lat: 14.180
+  center:
+    lat: 14.105
+    lon: -15.550
+
+dates:
+  season_year: 2026
+  season_start: "2026-05-01"
+  season_end: "2026-10-15"
+  reference_years: [2019, 2020, 2021, 2022, 2023, 2024, 2025]
+
+grid:
+  cell_size_deg: 0.0135 # ~1.5 km à cette latitude (111 km * 0.0135)
+  min_crop_fraction: 0.20 # Seuil d'exclusion : garder secteurs avec >= 20% de terres cultivées
+  worldcover_crop_class: 40 # ESA WorldCover 2021 classe 40 = Cropland
+
+sentinel2:
+  composite_days: 7 # Composite médian de 7 jours
+  scl_excluded_classes: [1, 3, 8, 9, 10] # 1: defective, 3: cloud shadows, 8: cloud med, 9: cloud high, 10: cirrus
+  min_valid_pixels: 50 # Minimum de pixels non masqués pour valider une observation
+
+detection_thresholds:
+  rain:
+    start_search_day: "06-01" # Date plancher pour la détection du début de saison (1er juin)
+    accum_days: 3 # Fenêtre glissante pour cumul de démarrage (3 jours)
+    trigger_accum_mm: 20.0 # Seuil de cumul de démarrage (20 mm)
+    dry_spell_window_days: 30 # Fenêtre après le début pour chercher la pause sèche (30 jours)
+    dry_day_max_rain_mm: 1.0 # Plafond de pluie pour considérer un jour comme sec (< 1 mm)
+    dry_spell_min_duration_days: 8 # Durée minimale d'une pause sèche critique (>= 8 jours)
+  ndvi:
+    peak_window_days: 25 # Pic dans les 25 jours après le début de saison
+    trough_window_days: 30 # Creux dans les 30 jours après le pic
+    relative_drop_min: 0.15 # Baisse relative minimale (15%) : (pic - creux) / pic >= 0.15
+    recovery_abs_min: 0.05 # Remontée absolue minimale (+0.05) après le creux
+    recovery_window_days: 40 # Remontée dans les 40 jours suivants le creux
+
+sensitivity_grid:
+  rain_trigger_accum_mm: [15.0, 20.0, 25.0]
+  dry_spell_min_duration_days: [6, 8, 10, 12]
+  ndvi_relative_drop_min: [0.10, 0.15, 0.20]
+
+paths:
+  raw:
+    chirps: "data/raw/chirps"
+    s2: "data/raw/s2"
+    worldcover: "data/raw/worldcover"
+    admin: "data/raw/admin"
+    osm: "data/raw/osm"
+    anacim: "data/raw/anacim"
+  processed:
+    dir: "data/processed"
+    metadata: "data/processed/metadata.json"
+    sectors: "data/processed/sectors.geojson"
+    rain_daily: "data/processed/rain_daily.csv"
+    ndvi_series: "data/processed/ndvi_series.csv"
+    ndvi_reference: "data/processed/ndvi_reference.csv"
+    results: "data/processed/results.json"
+    sensitivity: "data/processed/sensitivity.json"
