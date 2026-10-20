@@ -1,5 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react'
-import * as maplibregl from 'maplibre-gl'
+import React, { useState, useMemo } from 'react'
 import type { SectorResult, SectorsGeoJson, RainRecord, NdviRecord, NdviRefRecord } from '../lib/schemas'
 import { SectorDrawer } from './SectorDrawer'
 
@@ -24,9 +23,8 @@ export const MapView: React.FC<MapViewProps> = ({
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [viewMode, setViewMode] = useState<'carte' | 'grille'>('carte')
-
-  const mapContainerRef = useRef<HTMLDivElement>(null)
-  const mapInstanceRef = useRef<any>(null)
+  const [hoveredSector, setHoveredSector] = useState<SectorResult | null>(null)
+  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null)
 
   // Map results to sectorId
   const resultsBySector = useMemo(() => {
@@ -80,122 +78,39 @@ export const MapView: React.FC<MapViewProps> = ({
     return resultsBySector.get(selectedSectorId) || null
   }, [selectedSectorId, resultsBySector])
 
-  // Initialize MapLibre GL
-  useEffect(() => {
-    if (!mapContainerRef.current || !sectorsGeoJson || mapInstanceRef.current) return
+  // Project GeoJSON Polygons into SVG Paths
+  const svgPolygons = useMemo(() => {
+    if (!sectorsGeoJson) return []
 
-    try {
-      const map = new maplibregl.Map({
-        container: mapContainerRef.current,
-        style: {
-          version: 8,
-          sources: {
-            'osm-tiles': {
-              type: 'raster',
-              tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
-              tileSize: 256,
-              attribution: '&copy; OpenStreetMap contributors',
-            },
-          },
-          layers: [
-            {
-              id: 'osm-layer',
-              type: 'raster',
-              source: 'osm-tiles',
-              minzoom: 0,
-              maxzoom: 19,
-            },
-          ],
-        },
-        center: [-15.55, 14.10],
-        zoom: 10.5,
-      })
+    // Bounds for Kaffrine box
+    const minLon = -15.630
+    const maxLon = -15.470
+    const minLat = 14.030
+    const maxLat = 14.180
 
-      map.addControl(new maplibregl.NavigationControl(), 'top-right')
+    const width = 800
+    const height = 620
+    const pad = 40
 
-      map.on('load', () => {
-        // Enrich GeoJSON with results
-        const enrichedGeoJson = {
-          ...sectorsGeoJson,
-          features: sectorsGeoJson.features.map((feat) => {
-            const res = resultsBySector.get(feat.id as string)
-            return {
-              ...feat,
-              properties: {
-                ...feat.properties,
-                statut: res?.statut || 'non_evalue',
-                season_start_date: res?.season_start_date || 'Non détecté',
-                max_dry_days: res?.max_dry_days || 0,
-              },
-            }
-          }),
-        }
+    return sectorsGeoJson.features.map((feat) => {
+      const res = resultsBySector.get(feat.id as string)
+      const coords = (feat.geometry.coordinates[0] as number[][]) || []
 
-        map.addSource('sectors-source', {
-          type: 'geojson',
-          data: enrichedGeoJson as any,
+      const pathData = coords
+        .map(([lon, lat], idx) => {
+          const x = pad + ((lon - minLon) / (maxLon - minLon)) * (width - 2 * pad)
+          const y = height - pad - ((lat - minLat) / (maxLat - minLat)) * (height - 2 * pad)
+          return `${idx === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`
         })
+        .join(' ') + ' Z'
 
-        // Polygons layer with status color match
-        map.addLayer({
-          id: 'sectors-fill',
-          type: 'fill',
-          source: 'sectors-source',
-          paint: {
-            'fill-color': [
-              'match',
-              ['get', 'statut'],
-              'signature_probable',
-              '#E8B04A',
-              'baisse_a_examiner',
-              '#F4A261',
-              'pas_de_signature',
-              '#10B981',
-              '#9CA3AF',
-            ],
-            'fill-opacity': 0.65,
-          },
-        })
-
-        // Borders layer
-        map.addLayer({
-          id: 'sectors-line',
-          type: 'line',
-          source: 'sectors-source',
-          paint: {
-            'line-color': '#1F5C3A',
-            'line-width': 1.8,
-          },
-        })
-
-        // Hover effect cursor
-        map.on('mouseenter', 'sectors-fill', () => {
-          map.getCanvas().style.cursor = 'pointer'
-        })
-        map.on('mouseleave', 'sectors-fill', () => {
-          map.getCanvas().style.cursor = ''
-        })
-
-        // Click handler on sector
-        map.on('click', 'sectors-fill', (e: any) => {
-          if (e.features && e.features[0]) {
-            const clickedId = e.features[0].id as string
-            setSelectedSectorId(clickedId)
-          }
-        })
-      })
-
-      mapInstanceRef.current = map
-    } catch (err) {
-      console.warn('MapLibre init error (fallback rendering is active):', err)
-    }
-
-    return () => {
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove()
-        mapInstanceRef.current = null
+      return {
+        id: feat.id as string,
+        path: pathData,
+        res,
+        properties: feat.properties,
       }
-    }
+    })
   }, [sectorsGeoJson, resultsBySector])
 
   return (
@@ -310,12 +225,130 @@ export const MapView: React.FC<MapViewProps> = ({
 
       {/* Main Content Area */}
       {viewMode === 'carte' ? (
-        <div className="map-wrapper" style={{ position: 'relative', height: '620px', borderRadius: '16px', overflow: 'hidden', border: '1px solid var(--border)' }}>
-          {/* MapLibre DOM Node */}
-          <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }} />
+        <div
+          className="map-wrapper"
+          style={{
+            position: 'relative',
+            height: '620px',
+            borderRadius: '16px',
+            overflow: 'hidden',
+            border: '1px solid var(--border)',
+            background: 'linear-gradient(180deg, rgba(31,92,58,0.03) 0%, rgba(232,176,74,0.03) 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          {/* SVG Vector Choropleth Map */}
+          <svg
+            viewBox="0 0 800 620"
+            style={{ width: '100%', height: '100%', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.06))' }}
+          >
+            {/* Background Map Grid */}
+            <defs>
+              <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(31,92,58,0.06)" strokeWidth="1" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+
+            {/* Sectors Polygons */}
+            {svgPolygons.map(({ id, path, res, properties }) => {
+              const isSelected = selectedSectorId === id
+              const isProbable = res?.statut === 'signature_probable'
+              const isExamine = res?.statut === 'baisse_a_examiner'
+              const isNormal = res?.statut === 'pas_de_signature'
+
+              const fillColor = isProbable
+                ? '#E8B04A'
+                : isExamine
+                ? '#F4A261'
+                : isNormal
+                ? '#10B981'
+                : '#9CA3AF'
+
+              const opacity =
+                statusFilter === 'all'
+                  ? 0.72
+                  : res?.statut === statusFilter
+                  ? 0.85
+                  : 0.2
+
+              return (
+                <path
+                  key={id}
+                  d={path}
+                  fill={fillColor}
+                  fillOpacity={opacity}
+                  stroke={isSelected ? '#1F5C3A' : 'rgba(255,255,255,0.85)'}
+                  strokeWidth={isSelected ? 3 : 1.2}
+                  style={{
+                    cursor: 'pointer',
+                    transition: 'all 150ms ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (res) {
+                      setHoveredSector(res)
+                      setTooltipPos({ x: e.clientX, y: e.clientY })
+                    }
+                  }}
+                  onMouseMove={(e) => {
+                    setTooltipPos({ x: e.clientX, y: e.clientY })
+                  }}
+                  onMouseLeave={() => {
+                    setHoveredSector(null)
+                  }}
+                  onClick={() => setSelectedSectorId(id)}
+                />
+              )
+            })}
+          </svg>
+
+          {/* Floating Hover Tooltip */}
+          {hoveredSector && tooltipPos && (
+            <div
+              style={{
+                position: 'fixed',
+                top: tooltipPos.y - 110,
+                left: tooltipPos.x + 15,
+                zIndex: 1000,
+                background: 'rgba(27, 42, 34, 0.95)',
+                color: '#FFFFFF',
+                padding: '0.65rem 0.9rem',
+                borderRadius: '8px',
+                pointerEvents: 'none',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
+                fontSize: '0.82rem',
+                lineHeight: '1.4',
+                maxWidth: '240px',
+              }}
+            >
+              <div style={{ fontWeight: 700, fontSize: '0.88rem', color: '#8FD18A', marginBottom: '0.2rem' }}>
+                {hoveredSector.nom}
+              </div>
+              <div>📍 Commune : <strong>{hoveredSector.commune}</strong></div>
+              <div>📅 Semis : <strong>{hoveredSector.season_start_date || 'Non détecté'}</strong></div>
+              <div>⏳ Séquence sèche : <strong>{hoveredSector.max_dry_days} jours</strong></div>
+              <div style={{ marginTop: '0.35rem', paddingTop: '0.35rem', borderTop: '1px solid rgba(255,255,255,0.2)', fontSize: '0.75rem', color: '#E8B04A' }}>
+                👉 Cliquer pour ouvrir la fiche détaillée
+              </div>
+            </div>
+          )}
 
           {/* Floating Legend */}
-          <div className="card floating-legend" style={{ position: 'absolute', bottom: '20px', left: '20px', zIndex: 10, maxWidth: '280px', padding: '0.85rem' }}>
+          <div
+            className="card floating-legend"
+            style={{
+              position: 'absolute',
+              bottom: '20px',
+              left: '20px',
+              zIndex: 10,
+              maxWidth: '300px',
+              padding: '0.85rem',
+              background: 'var(--bg-card)',
+              boxShadow: 'var(--shadow-md)',
+            }}
+          >
             <div style={{ fontWeight: 700, fontSize: '0.85rem', marginBottom: '0.5rem', color: 'var(--clr-vert-semis)' }}>
               {wolofMode ? 'Melokaanoo yi' : 'Légende Statut Semis'}
             </div>
@@ -333,6 +366,13 @@ export const MapView: React.FC<MapViewProps> = ({
                 <span>Baisse NDVI à examiner</span>
               </div>
             </div>
+          </div>
+
+          {/* Map Controls */}
+          <div style={{ position: 'absolute', top: '15px', right: '15px', zIndex: 10, display: 'flex', gap: '0.5rem' }}>
+            <span className="badge badge--real" style={{ background: 'var(--bg-card)' }}>
+              100 Secteurs géolocalisés (Kaffrine)
+            </span>
           </div>
         </div>
       ) : (
