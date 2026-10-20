@@ -21,13 +21,15 @@ export const MethodologyView: React.FC<MethodologyViewProps> = ({
     <div className="page-container">
       {/* Title */}
       <section className="card" style={{ marginBottom: '1.5rem', background: 'var(--bg-card)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.4rem' }}>
-          <IconBook size={22} color="var(--clr-vert-semis)" />
-          <h1 style={{ fontFamily: 'var(--font-title)', fontSize: '1.65rem', fontWeight: 800, color: 'var(--clr-vert-semis)' }}>
+        <div className="page-header-row">
+          <div className="page-icon">
+            <IconBook size={24} color="var(--clr-vert-semis)" />
+          </div>
+          <h1 className="page-header-title">
             {wolofMode ? 'Xam-xam ak Teereb Données' : 'Méthodologie Scientifique & Traçabilité des Données'}
           </h1>
         </div>
-        <p style={{ color: 'var(--fg-muted)', fontSize: '0.92rem', maxWidth: '850px' }}>
+        <p style={{ color: 'var(--fg-muted)', fontSize: '0.92rem', maxWidth: '850px', lineHeight: 1.5 }}>
           Conformité stricte à la règle d'or du Hackathon SENSAT 2026 : aucun résultat inventé.
           Chaque détection provient de données satellitaires réelles vérifiables et d'algorithmes agro-météorologiques reconnus au Sahel.
         </p>

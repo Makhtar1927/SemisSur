@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import ReactDOM from 'react-dom'
 import { BrandLogo } from './BrandLogo'
 import {
   IconMap,
@@ -59,90 +60,9 @@ export const Navbar: React.FC<NavbarProps> = ({
     }
   }, [isMobileMenuOpen])
 
-  return (
-    <header className="navbar">
-      <div className="navbar__container">
-        {/* Official Brand Identity */}
-        <BrandLogo
-          size="md"
-          showTagline={true}
-          onClick={() => handleSelectTab('carte')}
-        />
-
-        {/* Desktop Segmented Navigation (Hidden on Mobile) */}
-        <nav className="navbar__nav navbar__nav--desktop">
-          <button
-            className={`nav-btn ${activeTab === 'carte' ? 'nav-btn--active' : ''}`}
-            onClick={() => handleSelectTab('carte')}
-          >
-            <IconMap size={16} />
-            <span>{wolofMode ? 'Koos / Nataal' : 'Carte Interactive'}</span>
-          </button>
-
-          <button
-            className={`nav-btn ${activeTab === 'historique' ? 'nav-btn--active' : ''}`}
-            onClick={() => handleSelectTab('historique')}
-          >
-            <IconHistory size={16} />
-            <span>{wolofMode ? 'Taarix 10 At' : 'Historique & Climat'}</span>
-          </button>
-
-          <button
-            className={`nav-btn ${activeTab === 'simulateur' ? 'nav-btn--active' : ''}`}
-            onClick={() => handleSelectTab('simulateur')}
-          >
-            <IconSliders size={16} />
-            <span>{wolofMode ? 'Nattukaay' : 'Simulateur'}</span>
-          </button>
-
-          <button
-            className={`nav-btn ${activeTab === 'methodologie' ? 'nav-btn--active' : ''}`}
-            onClick={() => handleSelectTab('methodologie')}
-          >
-            <IconBook size={16} />
-            <span>{wolofMode ? 'Xam-xam' : 'Méthode & Données'}</span>
-          </button>
-        </nav>
-
-        {/* Desktop Actions */}
-        <div className="navbar__actions navbar__actions--desktop">
-          {/* Wolof / French Switcher */}
-          <button
-            className={`btn-pill-lang ${wolofMode ? 'btn-pill-lang--active' : ''}`}
-            onClick={() => setWolofMode(!wolofMode)}
-            title="Basculer vers les conseils en Wolof"
-          >
-            <span style={{ fontSize: '0.82rem', fontWeight: 700 }}>SN</span>
-            <span style={{ fontWeight: 600 }}>{wolofMode ? 'Wolof' : 'Français'}</span>
-          </button>
-
-          {/* Dark / Light Mode Switch */}
-          <button
-            className="btn-theme-toggle"
-            onClick={toggleTheme}
-            aria-label="Basculer thème sombre / clair"
-            title="Basculer thème"
-          >
-            {theme === 'light' ? (
-              <IconMoon size={18} color="var(--fg-secondary)" />
-            ) : (
-              <IconSun size={18} color="#E8B04A" />
-            )}
-          </button>
-        </div>
-
-        {/* Mobile Hamburger Button (Visible only on mobile/tablet) */}
-        <button
-          className="btn-hamburger"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          aria-label="Ouvrir le menu de navigation"
-        >
-          {isMobileMenuOpen ? <IconClose size={22} /> : <IconMenu size={22} />}
-        </button>
-      </div>
-
-      {/* Mobile Navigation Drawer Overlay */}
-      {isMobileMenuOpen && (
+  // Mobile menu overlay rendered via portal directly into body (avoids header stacking context)
+  const mobileMenuPortal = isMobileMenuOpen
+    ? ReactDOM.createPortal(
         <div
           className="mobile-menu-overlay"
           onClick={() => setIsMobileMenuOpen(false)}
@@ -177,7 +97,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     {wolofMode ? 'Koos / Nataal' : 'Carte Interactive'}
                   </div>
                   <div className="mobile-nav-item__desc">
-                    Cartographie satellite & 100 mailles
+                    Cartographie satellite &amp; 100 mailles
                   </div>
                 </div>
               </button>
@@ -194,7 +114,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     {wolofMode ? 'Taarix 10 At' : 'Historique & Climat'}
                   </div>
                   <div className="mobile-nav-item__desc">
-                    Distribution 2015-2026 & tendances
+                    Distribution 2015-2026 &amp; tendances
                   </div>
                 </div>
               </button>
@@ -228,7 +148,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     {wolofMode ? 'Xam-xam' : 'Méthode & Données'}
                   </div>
                   <div className="mobile-nav-item__desc">
-                    CHIRPS, Sentinel-2 & Open Data
+                    CHIRPS, Sentinel-2 &amp; Open Data
                   </div>
                 </div>
               </button>
@@ -237,7 +157,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Mobile Settings Section (Wolof + Theme) */}
             <div className="mobile-menu__footer">
               <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem' }}>
-                {/* Language Switch */}
                 <button
                   className={`btn btn--secondary ${wolofMode ? 'btn--primary' : ''}`}
                   onClick={() => setWolofMode(!wolofMode)}
@@ -247,7 +166,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <span>{wolofMode ? 'Langue : Wolof' : 'Langue : Français'}</span>
                 </button>
 
-                {/* Theme Switch */}
                 <button
                   className="btn btn--secondary"
                   onClick={toggleTheme}
@@ -263,8 +181,95 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             </div>
           </div>
+        </div>,
+        document.body
+      )
+    : null
+
+  return (
+    <>
+      <header className="navbar">
+        <div className="navbar__container">
+          {/* Official Brand Identity */}
+          <BrandLogo
+            size="md"
+            showTagline={true}
+            onClick={() => handleSelectTab('carte')}
+          />
+
+          {/* Desktop Segmented Navigation (Hidden on Mobile) */}
+          <nav className="navbar__nav navbar__nav--desktop">
+            <button
+              className={`nav-btn ${activeTab === 'carte' ? 'nav-btn--active' : ''}`}
+              onClick={() => handleSelectTab('carte')}
+            >
+              <IconMap size={16} />
+              <span>{wolofMode ? 'Koos / Nataal' : 'Carte Interactive'}</span>
+            </button>
+
+            <button
+              className={`nav-btn ${activeTab === 'historique' ? 'nav-btn--active' : ''}`}
+              onClick={() => handleSelectTab('historique')}
+            >
+              <IconHistory size={16} />
+              <span>{wolofMode ? 'Taarix 10 At' : 'Historique & Climat'}</span>
+            </button>
+
+            <button
+              className={`nav-btn ${activeTab === 'simulateur' ? 'nav-btn--active' : ''}`}
+              onClick={() => handleSelectTab('simulateur')}
+            >
+              <IconSliders size={16} />
+              <span>{wolofMode ? 'Nattukaay' : 'Simulateur'}</span>
+            </button>
+
+            <button
+              className={`nav-btn ${activeTab === 'methodologie' ? 'nav-btn--active' : ''}`}
+              onClick={() => handleSelectTab('methodologie')}
+            >
+              <IconBook size={16} />
+              <span>{wolofMode ? 'Xam-xam' : 'Méthode & Données'}</span>
+            </button>
+          </nav>
+
+          {/* Desktop Actions */}
+          <div className="navbar__actions navbar__actions--desktop">
+            <button
+              className={`btn-pill-lang ${wolofMode ? 'btn-pill-lang--active' : ''}`}
+              onClick={() => setWolofMode(!wolofMode)}
+              title="Basculer vers les conseils en Wolof"
+            >
+              <span style={{ fontSize: '0.82rem', fontWeight: 700 }}>SN</span>
+              <span style={{ fontWeight: 600 }}>{wolofMode ? 'Wolof' : 'Français'}</span>
+            </button>
+
+            <button
+              className="btn-theme-toggle"
+              onClick={toggleTheme}
+              aria-label="Basculer thème sombre / clair"
+              title="Basculer thème"
+            >
+              {theme === 'light' ? (
+                <IconMoon size={18} color="var(--fg-secondary)" />
+              ) : (
+                <IconSun size={18} color="#E8B04A" />
+              )}
+            </button>
+          </div>
+
+          {/* Mobile Hamburger Button (Visible only on mobile/tablet) */}
+          <button
+            className="btn-hamburger"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Ouvrir le menu de navigation"
+          >
+            {isMobileMenuOpen ? <IconClose size={22} /> : <IconMenu size={22} />}
+          </button>
         </div>
-      )}
-    </header>
+      </header>
+
+      {/* Portal: rendered directly into <body> — above ALL page content */}
+      {mobileMenuPortal}
+    </>
   )
 }

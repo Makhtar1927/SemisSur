@@ -589,7 +589,7 @@ body {
   background: rgba(15, 23, 42, 0.55);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
-  z-index: 1000;
+  z-index: 9999; /* Portal: above Leaflet map, modals, everything */
   display: flex;
   justify-content: flex-end;
   animation: fadeIn 200ms ease;
@@ -686,19 +686,237 @@ body {
 /* ─── Mobile Adjustments for Maps & Controls ─── */
 @media (max-width: 640px) {
   .page-container {
-    padding: 1rem 1rem 3rem;
+    padding: 0.85rem 0.75rem 3rem;
   }
   .map-wrapper {
-    height: 480px !important;
+    height: 420px !important;
   }
   .floating-legend {
-    bottom: 10px !important;
-    left: 10px !important;
-    max-width: calc(100% - 20px) !important;
-    padding: 0.65rem 0.85rem !important;
-    font-size: 0.72rem !important;
+    bottom: 8px !important;
+    left: 8px !important;
+    max-width: calc(100% - 16px) !important;
+    padding: 0.55rem 0.75rem !important;
+    font-size: 0.70rem !important;
   }
   .stat-card__value {
-    font-size: 1.7rem;
+    font-size: 1.55rem;
   }
 }
+
+/* ─── Fluid Heading Sizes (Responsive Typography) ─── */
+/* Page-level h1 titles — scale from 1.1rem (mobile) to 1.65rem (desktop) */
+.page-header-title {
+  font-family: var(--font-title);
+  font-size: clamp(1.1rem, 4vw, 1.65rem);
+  font-weight: 800;
+  color: var(--clr-vert-semis);
+  line-height: 1.2;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+/* Page header row: icon + title — stacks on very small screens */
+.page-header-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-bottom: 0.4rem;
+  flex-wrap: wrap;
+}
+.page-header-row .page-icon {
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+}
+
+/* Filter row: wraps cleanly on mobile */
+.filter-row {
+  margin-top: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.filter-row label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.filter-row select {
+  flex: 1;
+  min-width: 0;
+  padding: 0.45rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 0.88rem;
+  font-family: var(--font-body);
+  outline: none;
+}
+
+/* ─── Chart grid: stay 1-col until 768px (charts need space) ─── */
+@media (max-width: 768px) {
+  .grid--2 { grid-template-columns: 1fr !important; }
+}
+
+/* ─── Card padding reduction on small screens ─── */
+@media (max-width: 480px) {
+  .card {
+    padding: 1rem 0.9rem;
+  }
+  .card__title {
+    font-size: 0.95rem;
+  }
+}
+
+/* ─── Drawer (Volet Secteur) Mobile Fixes ─── */
+@media (max-width: 768px) {
+  /* Header: allow pills/badges to wrap */
+  .drawer__header {
+    padding: 1rem 1.1rem;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+  .drawer__title {
+    font-size: clamp(1rem, 5vw, 1.35rem);
+    word-break: break-word;
+  }
+  /* Body padding reduced */
+  .drawer__body {
+    padding: 1rem 1rem;
+  }
+  /* Stat cards inside drawer: 2-col instead of 3 */
+  .drawer__body .grid--3 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem;
+  }
+  /* Pill + badge row inside drawer header: wrap */
+  .drawer__header > div:first-child > div:first-child {
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+  /* Meta info row below title */
+  .drawer__header > div:first-child > div:last-child {
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  /* Advice box: stack button below title */
+  .drawer__body .card > div:first-child {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 380px) {
+  /* Ultra-small: stat cards stack vertically */
+  .drawer__body .grid--3 {
+    grid-template-columns: 1fr !important;
+  }
+  .stat-card__value {
+    font-size: 1.3rem;
+  }
+}
+
+/* ─── Tableaux Récapitulatifs Responsives (Tables) ─── */
+.table-responsive-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  margin-top: 0.75rem;
+}
+
+.table-responsive-wrapper table {
+  width: 100%;
+  min-width: 580px; /* guarantees columns do not get crushed */
+  border-collapse: collapse;
+  font-size: 0.84rem;
+  text-align: left;
+}
+
+.table-responsive-wrapper th,
+.table-responsive-wrapper td {
+  padding: 0.7rem 0.85rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .table-responsive-wrapper th,
+  .table-responsive-wrapper td {
+    padding: 0.55rem 0.65rem;
+    font-size: 0.78rem;
+  }
+}
+
+/* ─── Carte Interactive Mobile (Contrôles & Boutons Flottants) ─── */
+@media (max-width: 640px) {
+  .map-wrapper {
+    height: 440px !important;
+  }
+
+  /* Map top controls (Satellite/OSM + Kaffrine/Senegal buttons) */
+  .map-wrapper > div[style*="position: absolute"][style*="top: 15px"] {
+    top: 8px !important;
+    right: 8px !important;
+    left: 8px !important;
+    justify-content: space-between !important;
+    gap: 0.35rem !important;
+  }
+
+  .map-wrapper > div[style*="position: absolute"][style*="top: 15px"] > div {
+    padding: 0.15rem !important;
+  }
+
+  .map-wrapper > div[style*="position: absolute"][style*="top: 15px"] button {
+    padding: 0.3rem 0.5rem !important;
+    font-size: 0.70rem !important;
+  }
+
+  /* Control bar (Recherche + Filtres boutons + Mode vue) */
+  .control-bar > div {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.65rem !important;
+  }
+
+  .control-bar > div > div {
+    width: 100% !important;
+    flex: 1 1 100% !important;
+  }
+
+  .control-bar > div > div:nth-child(2) {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.35rem !important;
+  }
+
+  .control-bar > div > div:nth-child(2) button {
+    padding: 0.45rem 0.35rem !important;
+    font-size: 0.72rem !important;
+    justify-content: center !important;
+  }
+
+  .control-bar > div > div:nth-child(3) {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.35rem !important;
+  }
+
+  .control-bar > div > div:nth-child(3) button {
+    justify-content: center !important;
+  }
+}
+
+/* ─── Diagrammes & Graphiques (ECharts Containers) ─── */
+@media (max-width: 640px) {
+  /* Reduce chart container height slightly on small phone screens for optimal proportions */
+  .card div[style*="height: 340px"] {
+    height: 280px !important;
+  }
+  .card div[style*="height: 240px"] {
+    height: 220px !important;
+  }
+}
+
+

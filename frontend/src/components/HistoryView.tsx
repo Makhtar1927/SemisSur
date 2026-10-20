@@ -127,30 +127,23 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
     <div className="page-container">
       {/* Header Info */}
       <section className="card" style={{ marginBottom: '1.5rem', background: 'var(--bg-card)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.4rem' }}>
-          <IconHistory size={22} color="var(--clr-vert-semis)" />
-          <h1 style={{ fontFamily: 'var(--font-title)', fontSize: '1.65rem', fontWeight: 800, color: 'var(--clr-vert-semis)' }}>
+        <div className="page-header-row">
+          <div className="page-icon">
+            <IconHistory size={24} color="var(--clr-vert-semis)" />
+          </div>
+          <h1 className="page-header-title">
             {wolofMode ? 'Taarix ak Waxtu ji ci Kaffrine' : 'Historique Agro-Climatique & Tendances des Semis'}
           </h1>
         </div>
-        <p style={{ color: 'var(--fg-muted)', fontSize: '0.92rem', maxWidth: '850px' }}>
+        <p style={{ color: 'var(--fg-muted)', fontSize: '0.92rem', maxWidth: '850px', lineHeight: 1.5 }}>
           Analyse rétrospective des 100 secteurs du bassin arachidier. Évaluation de la robustesse des démarrages de mousson, de la variabilité spatiale des premières pluies utiles et de la récurrence des poches de sécheresse post-semis.
         </p>
 
-        <div style={{ marginTop: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-          <label style={{ fontSize: '0.85rem', fontWeight: 600 }}>Filtrer par commune :</label>
+        <div className="filter-row">
+          <label>Filtrer par commune :</label>
           <select
             value={selectedCommune}
             onChange={(e) => setSelectedCommune(e.target.value)}
-            style={{
-              padding: '0.45rem 0.85rem',
-              borderRadius: '8px',
-              border: '1px solid var(--border)',
-              background: 'var(--bg)',
-              color: 'var(--fg)',
-              fontSize: '0.88rem',
-              outline: 'none',
-            }}
           >
             <option value="all">Toutes les communes ({results.length} secteurs)</option>
             {communes.map((c) => (

@@ -95,13 +95,15 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
     <div className="page-container">
       {/* Intro Header */}
       <section className="card" style={{ marginBottom: '1.5rem', background: 'var(--bg-card)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.4rem' }}>
-          <IconSliders size={22} color="var(--clr-vert-semis)" />
-          <h1 style={{ fontFamily: 'var(--font-title)', fontSize: '1.65rem', fontWeight: 800, color: 'var(--clr-vert-semis)' }}>
+        <div className="page-header-row">
+          <div className="page-icon">
+            <IconSliders size={24} color="var(--clr-vert-semis)" />
+          </div>
+          <h1 className="page-header-title">
             {wolofMode ? 'Nattukaay ak Séppukaay Paramètres' : 'Simulateur Interactif des Critères Sivakumar'}
           </h1>
         </div>
-        <p style={{ color: 'var(--fg-muted)', fontSize: '0.92rem', maxWidth: '850px' }}>
+        <p style={{ color: 'var(--fg-muted)', fontSize: '0.92rem', maxWidth: '850px', lineHeight: 1.5 }}>
           Recalculez instantanément les dates de semis et la sensibilité aux faux départs sur les 100 secteurs avec le moteur TypeScript. Ajustez les seuils pluviométriques et observez l'impact direct.
         </p>
       </section>
@@ -274,31 +276,31 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
         <h3 className="card__title">
           <span>Comparatif par Secteur (Échantillon représentatif)</span>
         </h3>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.84rem', textAlign: 'left' }}>
+        <div className="table-responsive-wrapper">
+          <table>
             <thead>
               <tr style={{ borderBottom: '2px solid var(--border)', color: 'var(--fg-muted)' }}>
-                <th style={{ padding: '0.7rem' }}>Secteur</th>
-                <th style={{ padding: '0.7rem' }}>Commune</th>
-                <th style={{ padding: '0.7rem' }}>Date Standard (20mm/3j)</th>
-                <th style={{ padding: '0.7rem' }}>Date Simulée ({triggerRain}mm/{accumDays}j)</th>
-                <th style={{ padding: '0.7rem' }}>Séquence Sèche Simulée</th>
-                <th style={{ padding: '0.7rem' }}>Statut Simulé</th>
+                <th>Secteur</th>
+                <th>Commune</th>
+                <th>Date Standard (20mm/3j)</th>
+                <th>Date Simulée ({triggerRain}mm/{accumDays}j)</th>
+                <th>Séquence Sèche Simulée</th>
+                <th>Statut Simulé</th>
               </tr>
             </thead>
             <tbody>
               {simulatedResults.sectors.slice(0, 10).map((sec) => (
                 <tr key={sec.sector_id} style={{ borderBottom: '1px solid var(--border)' }}>
-                  <td style={{ padding: '0.7rem', fontWeight: 600 }}>{sec.nom}</td>
-                  <td style={{ padding: '0.7rem' }}>{sec.commune}</td>
-                  <td style={{ padding: '0.7rem' }}>{sec.season_start_date || 'N/A'}</td>
-                  <td style={{ padding: '0.7rem', color: sec.sim_date !== sec.season_start_date ? 'var(--clr-or)' : 'inherit', fontWeight: sec.sim_date !== sec.season_start_date ? 700 : 400 }}>
+                  <td style={{ fontWeight: 600 }}>{sec.nom}</td>
+                  <td>{sec.commune}</td>
+                  <td>{sec.season_start_date || 'N/A'}</td>
+                  <td style={{ color: sec.sim_date !== sec.season_start_date ? 'var(--clr-or)' : 'inherit', fontWeight: sec.sim_date !== sec.season_start_date ? 700 : 400 }}>
                     {sec.sim_date || 'Non atteint'}
                   </td>
-                  <td style={{ padding: '0.7rem', color: sec.sim_critical ? 'var(--clr-alerte)' : 'var(--clr-vert-semis)' }}>
+                  <td style={{ color: sec.sim_critical ? 'var(--clr-alerte)' : 'var(--clr-vert-semis)' }}>
                     {sec.sim_dry_days} jours {sec.sim_critical && '⚠️'}
                   </td>
-                  <td style={{ padding: '0.7rem' }}>
+                  <td>
                     <span className={`pill ${sec.sim_critical ? 'pill--probable' : 'pill--aucune'}`}>
                       {sec.sim_critical ? 'Faux départ' : 'Normal'}
                     </span>
