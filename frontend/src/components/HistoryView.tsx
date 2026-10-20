@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import ReactECharts from 'echarts-for-react'
 import type { SectorResult, RainRecord } from '../lib/schemas'
+import { IconHistory, IconInfo } from './Icons'
 
 interface HistoryViewProps {
   results: SectorResult[]
@@ -10,7 +11,6 @@ interface HistoryViewProps {
 
 export const HistoryView: React.FC<HistoryViewProps> = ({
   results,
-  rainData,
   wolofMode,
 }) => {
   const [selectedCommune, setSelectedCommune] = useState<string>('all')
@@ -51,12 +51,12 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
       xAxis: {
         type: 'category',
         data: sortedDates,
-        axisLabel: { rotate: 25, fontSize: 11 },
+        axisLabel: { rotate: 25, fontSize: 11, fontFamily: 'var(--font-body)' },
       },
       yAxis: {
         type: 'value',
         name: 'Nb secteurs',
-        splitLine: { lineStyle: { type: 'dashed', opacity: 0.3 } },
+        splitLine: { lineStyle: { type: 'dashed', opacity: 0.25 } },
       },
       series: [
         {
@@ -64,7 +64,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
           type: 'bar',
           data: counts,
           itemStyle: {
-            color: '#1F5C3A',
+            color: '#164E31',
             borderRadius: [4, 4, 0, 0],
           },
           label: { show: true, position: 'top', fontSize: 10 },
@@ -101,22 +101,22 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
       xAxis: {
         type: 'value',
         name: 'Cumul 3j (mm)',
-        splitLine: { lineStyle: { type: 'dashed', opacity: 0.3 } },
+        splitLine: { lineStyle: { type: 'dashed', opacity: 0.25 } },
       },
       yAxis: {
         type: 'value',
         name: 'Séquence sèche (jours)',
-        splitLine: { lineStyle: { type: 'dashed', opacity: 0.3 } },
+        splitLine: { lineStyle: { type: 'dashed', opacity: 0.25 } },
       },
       series: [
         {
           name: 'Secteurs',
           type: 'scatter',
-          symbolSize: 14,
+          symbolSize: 13,
           data: data,
           itemStyle: {
             color: (param: any) =>
-              param.value[3] === 'Faux départ' ? '#E8B04A' : '#10B981',
+              param.value[3] === 'Faux départ' ? '#D97706' : '#15803D',
           },
         },
       ],
@@ -126,26 +126,30 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
   return (
     <div className="page-container">
       {/* Header Info */}
-      <section className="card" style={{ marginBottom: '1.5rem', background: 'linear-gradient(135deg, rgba(31,92,58,0.08) 0%, rgba(143,209,138,0.12) 100%)' }}>
-        <h1 style={{ fontFamily: 'var(--font-title)', fontSize: '1.8rem', color: 'var(--clr-vert-semis)', marginBottom: '0.5rem' }}>
-          {wolofMode ? 'Taarix ak Waxtu ji ci Kaffrine' : 'Historique Agro-Climatique & Tendances des Semis'}
-        </h1>
-        <p style={{ color: 'var(--fg-muted)', fontSize: '0.95rem', maxWidth: '850px' }}>
+      <section className="card" style={{ marginBottom: '1.5rem', background: 'var(--bg-card)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.4rem' }}>
+          <IconHistory size={22} color="var(--clr-vert-semis)" />
+          <h1 style={{ fontFamily: 'var(--font-title)', fontSize: '1.65rem', fontWeight: 800, color: 'var(--clr-vert-semis)' }}>
+            {wolofMode ? 'Taarix ak Waxtu ji ci Kaffrine' : 'Historique Agro-Climatique & Tendances des Semis'}
+          </h1>
+        </div>
+        <p style={{ color: 'var(--fg-muted)', fontSize: '0.92rem', maxWidth: '850px' }}>
           Analyse rétrospective des 100 secteurs du bassin arachidier. Évaluation de la robustesse des démarrages de mousson, de la variabilité spatiale des premières pluies utiles et de la récurrence des poches de sécheresse post-semis.
         </p>
 
-        <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-          <label style={{ fontSize: '0.88rem', fontWeight: 600 }}>Filtrer par commune :</label>
+        <div style={{ marginTop: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <label style={{ fontSize: '0.85rem', fontWeight: 600 }}>Filtrer par commune :</label>
           <select
             value={selectedCommune}
             onChange={(e) => setSelectedCommune(e.target.value)}
             style={{
-              padding: '0.4rem 0.8rem',
+              padding: '0.45rem 0.85rem',
               borderRadius: '8px',
               border: '1px solid var(--border)',
               background: 'var(--bg)',
               color: 'var(--fg)',
-              fontSize: '0.9rem',
+              fontSize: '0.88rem',
+              outline: 'none',
             }}
           >
             <option value="all">Toutes les communes ({results.length} secteurs)</option>
@@ -175,35 +179,35 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
 
       {/* Agronomic Recommendations based on historical analysis */}
       <div className="card">
-        <h3 className="card__title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <span>💡</span>
+        <h3 className="card__title">
+          <IconInfo size={18} />
           <span>{wolofMode ? 'Xam-xam yi ñu ciy jële' : 'Enseignements Clés pour le Producteur'}</span>
         </h3>
 
         <div className="grid grid--3" style={{ gap: '1.25rem', marginTop: '1rem' }}>
-          <div style={{ padding: '1rem', borderRadius: '12px', background: 'rgba(31,92,58,0.06)' }}>
-            <div style={{ fontWeight: 700, color: 'var(--clr-vert-semis)', marginBottom: '0.4rem' }}>
-              1. Le Piège des 20mm précoces
+          <div style={{ padding: '1rem', borderRadius: '12px', background: 'var(--bg-subtle)', border: '1px solid var(--border)' }}>
+            <div style={{ fontWeight: 700, color: 'var(--clr-vert-semis)', marginBottom: '0.35rem', fontSize: '0.92rem' }}>
+              1. Le Piège des 20 mm Précoces
             </div>
-            <p style={{ fontSize: '0.85rem', color: 'var(--fg-muted)', lineHeight: '1.4' }}>
-              Une pluie de 20 mm début juin est fréquente mais présente un risque de 65% de pause pluviométrique supérieure à 8 jours. Attendre la confirmation par une seconde pluie avant de semer les variétés à cycle long.
+            <p style={{ fontSize: '0.82rem', color: 'var(--fg-muted)', lineHeight: '1.45' }}>
+              Une pluie de 20 mm début juin est fréquente mais présente un risque élevé de pause pluviométrique supérieure à 8 jours. Attendre la confirmation par une seconde pluie avant de semer les variétés à cycle long.
             </p>
           </div>
 
-          <div style={{ padding: '1rem', borderRadius: '12px', background: 'rgba(232,176,74,0.08)' }}>
-            <div style={{ fontWeight: 700, color: '#8A5A32', marginBottom: '0.4rem' }}>
+          <div style={{ padding: '1rem', borderRadius: '12px', background: 'var(--bg-subtle)', border: '1px solid var(--border)' }}>
+            <div style={{ fontWeight: 700, color: 'var(--clr-or)', marginBottom: '0.35rem', fontSize: '0.92rem' }}>
               2. Échelonnement Variétal
             </div>
-            <p style={{ fontSize: '0.85rem', color: 'var(--fg-muted)', lineHeight: '1.4' }}>
+            <p style={{ fontSize: '0.82rem', color: 'var(--fg-muted)', lineHeight: '1.45' }}>
               Privilégier le semis des céréales résistantes (mil Sanio/Souna) en premier front et réserver l'arachide (73-33 ou 55-437) dès que le profil d'humidité du sol atteint 25 cm de profondeur.
             </p>
           </div>
 
-          <div style={{ padding: '1rem', borderRadius: '12px', background: 'rgba(143,209,138,0.1)' }}>
-            <div style={{ fontWeight: 700, color: '#1A5C2A', marginBottom: '0.4rem' }}>
+          <div style={{ padding: '1rem', borderRadius: '12px', background: 'var(--bg-subtle)', border: '1px solid var(--border)' }}>
+            <div style={{ fontWeight: 700, color: 'var(--clr-vert-semis)', marginBottom: '0.35rem', fontSize: '0.92rem' }}>
               3. Confirmation Optique NDVI
             </div>
-            <p style={{ fontSize: '0.85rem', color: 'var(--fg-muted)', lineHeight: '1.4' }}>
+            <p style={{ fontSize: '0.82rem', color: 'var(--fg-muted)', lineHeight: '1.45' }}>
               Le suivi par satellite Sentinel-2 valide l'installation réelle 15 à 20 jours après le semis. Si l'indice NDVI ne dépasse pas 0.28, une alerte resemis est déclenchée.
             </p>
           </div>

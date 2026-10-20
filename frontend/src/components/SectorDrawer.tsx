@@ -1,6 +1,15 @@
 import React, { useMemo } from 'react'
 import ReactECharts from 'echarts-for-react'
 import type { SectorResult, RainRecord, NdviRecord, NdviRefRecord } from '../lib/schemas'
+import {
+  IconClose,
+  IconVolume,
+  IconRain,
+  IconLeaf,
+  IconWarning,
+  IconCheck,
+  IconInfo,
+} from './Icons'
 
 interface SectorDrawerProps {
   sector: SectorResult | null
@@ -65,7 +74,7 @@ export const SectorDrawer: React.FC<SectorDrawerProps> = ({
       legend: {
         data: ['Pluie journalière (mm)', 'Pluie cumulée (mm)'],
         top: 0,
-        textStyle: { fontSize: 11 },
+        textStyle: { fontSize: 11, fontFamily: 'var(--font-body)' },
       },
       grid: { left: '8%', right: '8%', bottom: '15%', top: '18%' },
       xAxis: {
@@ -83,7 +92,7 @@ export const SectorDrawer: React.FC<SectorDrawerProps> = ({
         {
           type: 'value',
           name: 'Cumul (mm)',
-          splitLine: { lineStyle: { type: 'dashed', opacity: 0.3 } },
+          splitLine: { lineStyle: { type: 'dashed', opacity: 0.25 } },
         },
       ],
       series: [
@@ -93,7 +102,7 @@ export const SectorDrawer: React.FC<SectorDrawerProps> = ({
           data: dailyRain,
           itemStyle: {
             color: '#3B82F6',
-            borderRadius: [3, 3, 0, 0],
+            borderRadius: [2, 2, 0, 0],
           },
         },
         {
@@ -102,7 +111,7 @@ export const SectorDrawer: React.FC<SectorDrawerProps> = ({
           yAxisIndex: 1,
           data: cumRain,
           smooth: true,
-          lineStyle: { width: 2.5, color: '#1F5C3A' },
+          lineStyle: { width: 2.5, color: '#164E31' },
           markLine: sector.season_start_date
             ? {
                 symbol: 'none',
@@ -110,8 +119,8 @@ export const SectorDrawer: React.FC<SectorDrawerProps> = ({
                   {
                     name: 'Seuil 20 mm',
                     yAxis: 20,
-                    lineStyle: { color: '#E8B04A', type: 'dashed', width: 2 },
-                    label: { formatter: 'Seuil 20mm', position: 'insideEndTop' },
+                    lineStyle: { color: '#D97706', type: 'dashed', width: 2 },
+                    label: { formatter: 'Seuil Sivakumar 20mm', position: 'insideEndTop' },
                   },
                 ],
               }
@@ -125,9 +134,6 @@ export const SectorDrawer: React.FC<SectorDrawerProps> = ({
   const ndviChartOption = useMemo(() => {
     const dates = sectorNdvi.map((d) => d.date_start.substring(5))
     const ndviMedians = sectorNdvi.map((d) => d.ndvi_median)
-
-    // Build corridor from reference if available
-    const refP10 = sectorRef.map((r) => r.ndvi_p10)
     const refP50 = sectorRef.map((r) => r.ndvi_p50)
     const refP90 = sectorRef.map((r) => r.ndvi_p90)
 
@@ -139,7 +145,7 @@ export const SectorDrawer: React.FC<SectorDrawerProps> = ({
       legend: {
         data: ['NDVI 2026', 'Référence Médiane (P50)', 'Couloir normal (P10 - P90)'],
         top: 0,
-        textStyle: { fontSize: 11 },
+        textStyle: { fontSize: 11, fontFamily: 'var(--font-body)' },
       },
       grid: { left: '8%', right: '8%', bottom: '15%', top: '18%' },
       xAxis: {
@@ -152,7 +158,7 @@ export const SectorDrawer: React.FC<SectorDrawerProps> = ({
         name: 'NDVI',
         min: 0.1,
         max: 0.7,
-        splitLine: { lineStyle: { type: 'dashed', opacity: 0.3 } },
+        splitLine: { lineStyle: { type: 'dashed', opacity: 0.25 } },
       },
       series: [
         {
@@ -160,8 +166,8 @@ export const SectorDrawer: React.FC<SectorDrawerProps> = ({
           type: 'line',
           data: ndviMedians,
           smooth: true,
-          lineStyle: { width: 3, color: '#10B981' },
-          itemStyle: { color: '#10B981' },
+          lineStyle: { width: 2.8, color: '#16A34A' },
+          itemStyle: { color: '#16A34A' },
           markPoint: sector.ndvi_trough_value
             ? {
                 data: [
@@ -172,7 +178,7 @@ export const SectorDrawer: React.FC<SectorDrawerProps> = ({
                       sector.ndvi_trough_value,
                     ],
                     value: 'Chute',
-                    itemStyle: { color: '#EF4444' },
+                    itemStyle: { color: '#DC2626' },
                   },
                 ],
               }
@@ -183,7 +189,7 @@ export const SectorDrawer: React.FC<SectorDrawerProps> = ({
           type: 'line',
           data: refP50.length ? refP50 : undefined,
           smooth: true,
-          lineStyle: { width: 2, color: '#8A5A32', type: 'dotted' },
+          lineStyle: { width: 2, color: '#854D0E', type: 'dotted' },
         },
         {
           name: 'Couloir normal (P10 - P90)',
@@ -220,7 +226,7 @@ export const SectorDrawer: React.FC<SectorDrawerProps> = ({
         {/* Header */}
         <div className="drawer__header">
           <div>
-            <div className="drawer__badges">
+            <div style={{ display: 'flex', gap: '0.45rem', marginBottom: '0.45rem' }}>
               <span className={`pill pill--${sector.statut === 'signature_probable' ? 'probable' : sector.statut === 'baisse_a_examiner' ? 'examine' : 'aucune'}`}>
                 {sector.statut === 'signature_probable'
                   ? 'Faux départ probable'
@@ -229,17 +235,18 @@ export const SectorDrawer: React.FC<SectorDrawerProps> = ({
                   : 'Semis normal'}
               </span>
               <span className="badge badge--real">
-                Confiance : {sector.confidence}
+                Indice de confiance : {sector.confidence}
               </span>
             </div>
             <h2 className="drawer__title">{sector.nom}</h2>
-            <div className="drawer__meta">
-              <span>📍 Commune : <strong>{sector.commune}</strong></span>
-              <span>🌾 Part agricole : <strong>{Math.round(sector.crop_frac * 100)}%</strong></span>
+            <div style={{ display: 'flex', gap: '1rem', fontSize: '0.82rem', color: 'var(--fg-muted)', marginTop: '0.35rem' }}>
+              <span>Commune : <strong>{sector.commune}</strong></span>
+              <span>•</span>
+              <span>Part agricole : <strong>{Math.round(sector.crop_frac * 100)}%</strong></span>
             </div>
           </div>
           <button className="drawer__close" onClick={onClose} aria-label="Fermer le volet">
-            ✕
+            <IconClose size={18} />
           </button>
         </div>
 
@@ -247,59 +254,59 @@ export const SectorDrawer: React.FC<SectorDrawerProps> = ({
         <div className="drawer__body">
           {/* Diagnostic Key Numbers */}
           <div className="grid grid--3" style={{ marginBottom: '1.25rem' }}>
-            <div className="stat-card">
-              <div className="stat-card__label">Date de Semis Détectée</div>
-              <div className="stat-card__value" style={{ fontSize: '1.25rem', color: '#1F5C3A' }}>
+            <div className="stat-card" style={{ padding: '1rem' }}>
+              <div className="stat-card__label">Date Semis</div>
+              <div className="stat-card__value" style={{ fontSize: '1.25rem', color: 'var(--clr-vert-semis)' }}>
                 {sector.season_start_date ? sector.season_start_date : 'Non détecté'}
               </div>
               <div className="stat-card__desc">
-                Cumul déclencheur : <strong>{sector.season_trigger_mm || 0} mm</strong>
+                Cumul : <strong>{sector.season_trigger_mm || 0} mm</strong>
               </div>
             </div>
 
-            <div className="stat-card">
-              <div className="stat-card__label">Séquence Sèche Post-Semis</div>
-              <div className="stat-card__value" style={{ fontSize: '1.25rem', color: sector.dry_is_critical ? '#EF4444' : '#10B981' }}>
-                {sector.max_dry_days} jours
+            <div className="stat-card" style={{ padding: '1rem' }}>
+              <div className="stat-card__label">Pause Sèche</div>
+              <div className="stat-card__value" style={{ fontSize: '1.25rem', color: sector.dry_is_critical ? 'var(--clr-alerte)' : 'var(--clr-vert-semis)' }}>
+                {sector.max_dry_days} j
               </div>
               <div className="stat-card__desc">
-                {sector.dry_is_critical ? 'Critique (≥ 8 jours)' : 'Tolérable (< 8 jours)'}
+                {sector.dry_is_critical ? 'Critique (≥ 8 jours)' : 'Tolérable (< 8j)'}
               </div>
             </div>
 
-            <div className="stat-card">
-              <div className="stat-card__label">Chute NDVI Détectée</div>
+            <div className="stat-card" style={{ padding: '1rem' }}>
+              <div className="stat-card__label">Chute NDVI</div>
               <div className="stat-card__value" style={{ fontSize: '1.25rem' }}>
                 {sector.ndvi_relative_drop
                   ? `-${Math.round(sector.ndvi_relative_drop * 100)}%`
-                  : 'Aucune'}
+                  : '0%'}
               </div>
               <div className="stat-card__desc">
-                Anomalie min : {sector.ndvi_anomaly_min ? sector.ndvi_anomaly_min.toFixed(2) : '0.00'}
+                Anomalie : {sector.ndvi_anomaly_min ? sector.ndvi_anomaly_min.toFixed(2) : '0.00'}
               </div>
             </div>
           </div>
 
           {/* Bilingual Farmer Advice Box */}
-          <div className="card" style={{ background: 'rgba(232, 176, 74, 0.1)', borderColor: 'rgba(232, 176, 74, 0.4)', marginBottom: '1.25rem' }}>
+          <div className="card" style={{ background: 'var(--bg-subtle)', borderLeft: '4px solid var(--clr-vert-semis)', marginBottom: '1.25rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ fontSize: '1.4rem' }}>📢</span>
-                <strong style={{ color: '#8A5A32', fontFamily: 'var(--font-title)' }}>
-                  {wolofMode ? 'Jàngat ak Digle ci Wolof' : 'Conseil Agro-Météorologique'}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                <IconInfo size={16} color="var(--clr-vert-semis)" />
+                <strong style={{ fontFamily: 'var(--font-title)', fontSize: '0.9rem', color: 'var(--clr-vert-semis)' }}>
+                  {wolofMode ? 'Jàngat ak Digle ci Wolof' : 'Avis Agro-Météorologique'}
                 </strong>
               </div>
               <button
-                className="btn btn--secondary"
-                style={{ padding: '0.3rem 0.7rem', fontSize: '0.78rem' }}
+                className="btn btn--secondary btn--sm"
                 onClick={handleSpeakAdvice}
                 title="Écouter le message vocal"
               >
-                🔊 {wolofMode ? 'Déglul' : 'Écouter'}
+                <IconVolume size={14} />
+                <span>{wolofMode ? 'Déglul' : 'Écouter'}</span>
               </button>
             </div>
 
-            <p style={{ fontSize: '0.92rem', lineHeight: '1.45', color: 'var(--fg)', marginBottom: '0.4rem' }}>
+            <p style={{ fontSize: '0.88rem', lineHeight: '1.5', color: 'var(--fg)' }}>
               {wolofMode ? (
                 sector.statut === 'signature_probable' ? (
                   <>
@@ -330,12 +337,13 @@ export const SectorDrawer: React.FC<SectorDrawerProps> = ({
           {/* Chart 1: Rainfall & Cumulative */}
           <div className="card" style={{ marginBottom: '1.25rem' }}>
             <div className="card__title">
-              🌧️ Pluviométrie journalière & Cumulatif (CHIRPS Daily)
+              <IconRain size={16} />
+              <span>Pluviométrie journalière & Cumul (CHIRPS Daily)</span>
             </div>
-            <div style={{ height: '260px', width: '100%' }}>
+            <div style={{ height: '240px', width: '100%' }}>
               <ReactECharts option={rainChartOption} style={{ height: '100%', width: '100%' }} />
             </div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--fg-muted)', marginTop: '0.4rem', textAlign: 'center' }}>
+            <div style={{ fontSize: '0.74rem', color: 'var(--fg-muted)', marginTop: '0.35rem', textAlign: 'center' }}>
               Ligne dorée = Seuil Sivakumar de déclenchement (20 mm en 3 jours après le 1er Juin).
             </div>
           </div>
@@ -343,12 +351,13 @@ export const SectorDrawer: React.FC<SectorDrawerProps> = ({
           {/* Chart 2: NDVI Profile */}
           <div className="card">
             <div className="card__title">
-              🌱 Profil Phénologique NDVI (Sentinel-2 / MODIS)
+              <IconLeaf size={16} />
+              <span>Profil Phénologique NDVI (Sentinel-2 / MODIS)</span>
             </div>
-            <div style={{ height: '260px', width: '100%' }}>
+            <div style={{ height: '240px', width: '100%' }}>
               <ReactECharts option={ndviChartOption} style={{ height: '100%', width: '100%' }} />
             </div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--fg-muted)', marginTop: '0.4rem', textAlign: 'center' }}>
+            <div style={{ fontSize: '0.74rem', color: 'var(--fg-muted)', marginTop: '0.35rem', textAlign: 'center' }}>
               Zone verte : NDVI observé 2026. Courbe pointillée : Référence historique médiane du secteur.
             </div>
           </div>

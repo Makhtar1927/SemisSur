@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import type { SectorResult, RainRecord, SensitivityJson } from '../lib/schemas'
 import { detectSeasonStart, detectDrySpell } from '../lib/detection'
+import { IconSliders, IconRefresh, IconCheck, IconWarning } from './Icons'
 
 interface SimulatorViewProps {
   results: SectorResult[]
@@ -12,7 +13,6 @@ interface SimulatorViewProps {
 export const SimulatorView: React.FC<SimulatorViewProps> = ({
   results,
   rainData,
-  sensitivity,
   wolofMode,
 }) => {
   // Simulator Parameters State
@@ -94,10 +94,13 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
   return (
     <div className="page-container">
       {/* Intro Header */}
-      <section className="card" style={{ marginBottom: '1.5rem', background: 'linear-gradient(135deg, rgba(232,176,74,0.1) 0%, rgba(31,92,58,0.08) 100%)' }}>
-        <h1 style={{ fontFamily: 'var(--font-title)', fontSize: '1.8rem', color: 'var(--clr-vert-semis)', marginBottom: '0.4rem' }}>
-          🎛️ {wolofMode ? 'Nattukaay ak Séppukaay Paramètres' : 'Simulateur Interactif des Critères Sivakumar'}
-        </h1>
+      <section className="card" style={{ marginBottom: '1.5rem', background: 'var(--bg-card)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.4rem' }}>
+          <IconSliders size={22} color="var(--clr-vert-semis)" />
+          <h1 style={{ fontFamily: 'var(--font-title)', fontSize: '1.65rem', fontWeight: 800, color: 'var(--clr-vert-semis)' }}>
+            {wolofMode ? 'Nattukaay ak Séppukaay Paramètres' : 'Simulateur Interactif des Critères Sivakumar'}
+          </h1>
+        </div>
         <p style={{ color: 'var(--fg-muted)', fontSize: '0.92rem', maxWidth: '850px' }}>
           Recalculez instantanément les dates de semis et la sensibilité aux faux départs sur les 100 secteurs avec le moteur TypeScript. Ajustez les seuils pluviométriques et observez l'impact direct.
         </p>
@@ -107,13 +110,16 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
       <div className="grid grid--2" style={{ gap: '1.5rem', marginBottom: '1.5rem' }}>
         {/* Controls Card */}
         <div className="card">
-          <h3 className="card__title">⚙️ Paramètres de Détection</h3>
+          <h3 className="card__title">
+            <IconSliders size={18} />
+            <span>Paramètres de Détection</span>
+          </h3>
 
           {/* Slider 1: Rain Trigger */}
           <div style={{ marginBottom: '1.25rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
-              <label style={{ fontSize: '0.88rem', fontWeight: 600 }}>Pluie cumulée déclenchante :</label>
-              <strong style={{ color: 'var(--clr-vert-semis)' }}>{triggerRain} mm</strong>
+              <label style={{ fontSize: '0.85rem', fontWeight: 600 }}>Pluie cumulée déclenchante :</label>
+              <strong style={{ color: 'var(--clr-vert-semis)', fontFamily: 'var(--font-title)' }}>{triggerRain} mm</strong>
             </div>
             <input
               type="range"
@@ -125,17 +131,17 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
               style={{ width: '100%', accentColor: 'var(--clr-vert-semis)' }}
             />
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: 'var(--fg-muted)' }}>
-              <span>10 mm (très précoce)</span>
+              <span>10 mm (précoce)</span>
               <span>20 mm (standard Sivakumar)</span>
-              <span>40 mm (très prudent)</span>
+              <span>40 mm (prudent)</span>
             </div>
           </div>
 
           {/* Slider 2: Accumulation Days */}
           <div style={{ marginBottom: '1.25rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
-              <label style={{ fontSize: '0.88rem', fontWeight: 600 }}>Fenêtre de cumul :</label>
-              <strong style={{ color: 'var(--clr-vert-semis)' }}>{accumDays} jours</strong>
+              <label style={{ fontSize: '0.85rem', fontWeight: 600 }}>Fenêtre de cumul :</label>
+              <strong style={{ color: 'var(--clr-vert-semis)', fontFamily: 'var(--font-title)' }}>{accumDays} jours</strong>
             </div>
             <input
               type="range"
@@ -147,7 +153,7 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
               style={{ width: '100%', accentColor: 'var(--clr-vert-semis)' }}
             />
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: 'var(--fg-muted)' }}>
-              <span>1 jour (pluie orageuse unique)</span>
+              <span>1 jour (orage unique)</span>
               <span>3 jours (standard)</span>
               <span>5 jours (lissé)</span>
             </div>
@@ -156,8 +162,8 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
           {/* Slider 3: Max Dry Spell */}
           <div style={{ marginBottom: '1.25rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
-              <label style={{ fontSize: '0.88rem', fontWeight: 600 }}>Séquence sèche critique post-semis :</label>
-              <strong style={{ color: '#EF4444' }}>≥ {drySpellMaxDays} jours</strong>
+              <label style={{ fontSize: '0.85rem', fontWeight: 600 }}>Séquence sèche critique post-semis :</label>
+              <strong style={{ color: 'var(--clr-alerte)', fontFamily: 'var(--font-title)' }}>≥ {drySpellMaxDays} jours</strong>
             </div>
             <input
               type="range"
@@ -166,7 +172,7 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
               step="1"
               value={drySpellMaxDays}
               onChange={(e) => setDrySpellMaxDays(Number(e.target.value))}
-              style={{ width: '100%', accentColor: '#EF4444' }}
+              style={{ width: '100%', accentColor: 'var(--clr-alerte)' }}
             />
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: 'var(--fg-muted)' }}>
               <span>5 jours (stricte)</span>
@@ -177,7 +183,7 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
 
           {/* Start Search Day Dropdown */}
           <div>
-            <label style={{ fontSize: '0.88rem', fontWeight: 600, display: 'block', marginBottom: '0.35rem' }}>
+            <label style={{ fontSize: '0.85rem', fontWeight: 600, display: 'block', marginBottom: '0.35rem' }}>
               Date de début de recherche :
             </label>
             <select
@@ -185,12 +191,13 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
               onChange={(e) => setStartSearchDay(e.target.value)}
               style={{
                 width: '100%',
-                padding: '0.45rem 0.8rem',
+                padding: '0.5rem 0.85rem',
                 borderRadius: '8px',
                 border: '1px solid var(--border)',
                 background: 'var(--bg)',
                 color: 'var(--fg)',
-                fontSize: '0.9rem',
+                fontSize: '0.88rem',
+                outline: 'none',
               }}
             >
               <option value="05-15">15 Mai (très précoce)</option>
@@ -203,38 +210,41 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
         {/* Live Comparison Results Card */}
         <div className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <div>
-            <h3 className="card__title">📊 Impact en Temps Réel</h3>
+            <h3 className="card__title">
+              <IconCheck size={18} />
+              <span>Impact en Temps Réel</span>
+            </h3>
 
             <div className="grid grid--2" style={{ gap: '1rem', margin: '1rem 0' }}>
-              <div style={{ padding: '1rem', borderRadius: '12px', background: 'rgba(31,92,58,0.08)', textAlign: 'center' }}>
+              <div style={{ padding: '1.1rem', borderRadius: '12px', background: 'var(--bg-subtle)', textAlign: 'center', border: '1px solid var(--border)' }}>
                 <div style={{ fontSize: '0.78rem', color: 'var(--fg-muted)' }}>Secteurs Déclenchés</div>
-                <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--clr-vert-semis)' }}>
+                <div style={{ fontSize: '1.9rem', fontWeight: 800, color: 'var(--clr-vert-semis)', fontFamily: 'var(--font-title)' }}>
                   {simulatedResults.detectedCount} / {results.length}
                 </div>
-                <div style={{ fontSize: '0.75rem', marginTop: '0.2rem' }}>
+                <div style={{ fontSize: '0.75rem', marginTop: '0.2rem', color: 'var(--fg-muted)' }}>
                   {Math.round((simulatedResults.detectedCount / results.length) * 100)}% de la zone
                 </div>
               </div>
 
-              <div style={{ padding: '1rem', borderRadius: '12px', background: 'rgba(232,176,74,0.12)', textAlign: 'center' }}>
+              <div style={{ padding: '1.1rem', borderRadius: '12px', background: 'var(--bg-subtle)', textAlign: 'center', border: '1px solid var(--border)' }}>
                 <div style={{ fontSize: '0.78rem', color: 'var(--fg-muted)' }}>Faux Départs Simulés</div>
-                <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#8A5A32' }}>
+                <div style={{ fontSize: '1.9rem', fontWeight: 800, color: 'var(--clr-or)', fontFamily: 'var(--font-title)' }}>
                   {simulatedResults.criticalDryCount}
                 </div>
-                <div style={{ fontSize: '0.75rem', marginTop: '0.2rem' }}>
+                <div style={{ fontSize: '0.75rem', marginTop: '0.2rem', color: 'var(--fg-muted)' }}>
                   Séquence sèche ≥ {drySpellMaxDays}j
                 </div>
               </div>
             </div>
 
-            <div style={{ padding: '0.85rem', borderRadius: '10px', background: 'var(--bg)', border: '1px solid var(--border)', fontSize: '0.85rem' }}>
-              <strong>Comparaison avec les critères de référence :</strong>
+            <div style={{ padding: '0.9rem', borderRadius: '10px', background: 'var(--bg-subtle)', border: '1px solid var(--border)', fontSize: '0.84rem' }}>
+              <strong>Comparaison avec les critères standards :</strong>
               <ul style={{ paddingLeft: '1.2rem', marginTop: '0.4rem', color: 'var(--fg-muted)', lineHeight: '1.5' }}>
                 <li>Seuil par défaut : <strong>20 mm en 3j</strong> après le 01/06.</li>
                 <li>Seuil simulé actuel : <strong>{triggerRain} mm en {accumDays}j</strong> après le {startSearchDay}.</li>
                 <li>
                   Différence de détection :{' '}
-                  <strong style={{ color: simulatedResults.detectedCount >= 100 ? '#10B981' : '#E8B04A' }}>
+                  <strong style={{ color: simulatedResults.detectedCount >= 100 ? 'var(--clr-vert-semis)' : 'var(--clr-or)' }}>
                     {simulatedResults.detectedCount - 100 >= 0 ? `+${simulatedResults.detectedCount - 100}` : simulatedResults.detectedCount - 100} secteurs
                   </strong>
                 </li>
@@ -253,7 +263,8 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
             }}
             style={{ marginTop: '1rem', alignSelf: 'flex-start' }}
           >
-            🔄 Réinitialiser aux paramètres par défaut
+            <IconRefresh size={14} />
+            <span>Réinitialiser aux paramètres par défaut</span>
           </button>
         </div>
       </div>
@@ -261,33 +272,33 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
       {/* Comparison Table: Standard vs Simulated */}
       <div className="card">
         <h3 className="card__title">
-          📋 Comparatif par Secteur (Échantillon représentatif)
+          <span>Comparatif par Secteur (Échantillon représentatif)</span>
         </h3>
         <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem', textAlign: 'left' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.84rem', textAlign: 'left' }}>
             <thead>
               <tr style={{ borderBottom: '2px solid var(--border)', color: 'var(--fg-muted)' }}>
-                <th style={{ padding: '0.6rem' }}>Secteur</th>
-                <th style={{ padding: '0.6rem' }}>Commune</th>
-                <th style={{ padding: '0.6rem' }}>Date Standard (20mm/3j)</th>
-                <th style={{ padding: '0.6rem' }}>Date Simulée ({triggerRain}mm/{accumDays}j)</th>
-                <th style={{ padding: '0.6rem' }}>Séquence Sèche Simulée</th>
-                <th style={{ padding: '0.6rem' }}>Statut Simulé</th>
+                <th style={{ padding: '0.7rem' }}>Secteur</th>
+                <th style={{ padding: '0.7rem' }}>Commune</th>
+                <th style={{ padding: '0.7rem' }}>Date Standard (20mm/3j)</th>
+                <th style={{ padding: '0.7rem' }}>Date Simulée ({triggerRain}mm/{accumDays}j)</th>
+                <th style={{ padding: '0.7rem' }}>Séquence Sèche Simulée</th>
+                <th style={{ padding: '0.7rem' }}>Statut Simulé</th>
               </tr>
             </thead>
             <tbody>
               {simulatedResults.sectors.slice(0, 10).map((sec) => (
                 <tr key={sec.sector_id} style={{ borderBottom: '1px solid var(--border)' }}>
-                  <td style={{ padding: '0.6rem', fontWeight: 600 }}>{sec.nom}</td>
-                  <td style={{ padding: '0.6rem' }}>{sec.commune}</td>
-                  <td style={{ padding: '0.6rem' }}>{sec.season_start_date || 'N/A'}</td>
-                  <td style={{ padding: '0.6rem', color: sec.sim_date !== sec.season_start_date ? '#E8B04A' : 'inherit', fontWeight: sec.sim_date !== sec.season_start_date ? 700 : 400 }}>
+                  <td style={{ padding: '0.7rem', fontWeight: 600 }}>{sec.nom}</td>
+                  <td style={{ padding: '0.7rem' }}>{sec.commune}</td>
+                  <td style={{ padding: '0.7rem' }}>{sec.season_start_date || 'N/A'}</td>
+                  <td style={{ padding: '0.7rem', color: sec.sim_date !== sec.season_start_date ? 'var(--clr-or)' : 'inherit', fontWeight: sec.sim_date !== sec.season_start_date ? 700 : 400 }}>
                     {sec.sim_date || 'Non atteint'}
                   </td>
-                  <td style={{ padding: '0.6rem', color: sec.sim_critical ? '#EF4444' : '#10B981' }}>
+                  <td style={{ padding: '0.7rem', color: sec.sim_critical ? 'var(--clr-alerte)' : 'var(--clr-vert-semis)' }}>
                     {sec.sim_dry_days} jours {sec.sim_critical && '⚠️'}
                   </td>
-                  <td style={{ padding: '0.6rem' }}>
+                  <td style={{ padding: '0.7rem' }}>
                     <span className={`pill ${sec.sim_critical ? 'pill--probable' : 'pill--aucune'}`}>
                       {sec.sim_critical ? 'Faux départ' : 'Normal'}
                     </span>

@@ -1,6 +1,17 @@
 import React, { useState, useMemo } from 'react'
 import type { SectorResult, SectorsGeoJson, RainRecord, NdviRecord, NdviRefRecord } from '../lib/schemas'
 import { SectorDrawer } from './SectorDrawer'
+import {
+  IconSearch,
+  IconWarning,
+  IconCheck,
+  IconMap,
+  IconGrid,
+  IconSatellite,
+  IconRain,
+  IconLeaf,
+  IconInfo,
+} from './Icons'
 
 interface MapViewProps {
   sectorsGeoJson: SectorsGeoJson | null
@@ -82,7 +93,6 @@ export const MapView: React.FC<MapViewProps> = ({
   const svgPolygons = useMemo(() => {
     if (!sectorsGeoJson) return []
 
-    // Bounds for Kaffrine box
     const minLon = -15.630
     const maxLon = -15.470
     const minLat = 14.030
@@ -119,69 +129,91 @@ export const MapView: React.FC<MapViewProps> = ({
       <section className="kpi-banner">
         <div className="grid grid--4">
           <div className="stat-card">
-            <div className="stat-card__label">
-              {wolofMode ? 'Mboolem Koos yi' : 'Secteurs Analysés'}
+            <div className="stat-card__header">
+              <span className="stat-card__label">
+                {wolofMode ? 'Mboolem Koos yi' : 'Secteurs Analysés'}
+              </span>
+              <div className="stat-card__icon">
+                <IconMap size={16} />
+              </div>
             </div>
             <div className="stat-card__value">{kpiStats.total}</div>
-            <div className="stat-card__desc">Zone Kaffrine / Bassin arachidier</div>
+            <div className="stat-card__desc">Zone Kaffrine • 100 mailles agricoles</div>
           </div>
 
           <div className="stat-card">
-            <div className="stat-card__label">
-              {wolofMode ? 'Taw yu am jiwu' : 'Déclenchement du Semis'}
+            <div className="stat-card__header">
+              <span className="stat-card__label">
+                {wolofMode ? 'Taw yu am jiwu' : 'Déclenchement du Semis'}
+              </span>
+              <div className="stat-card__icon" style={{ background: 'var(--clr-vert-light)', color: 'var(--clr-vert-semis)' }}>
+                <IconCheck size={16} />
+              </div>
             </div>
-            <div className="stat-card__value" style={{ color: '#10B981' }}>
+            <div className="stat-card__value" style={{ color: 'var(--clr-vert-semis)' }}>
               {kpiStats.detectedPct}%
             </div>
-            <div className="stat-card__desc">Seuil Sivakumar 20mm atteint</div>
+            <div className="stat-card__desc">Critère Sivakumar 20mm atteint</div>
           </div>
 
           <div className="stat-card">
-            <div className="stat-card__label">
-              {wolofMode ? 'Moytul / Fàcc' : 'Faux Départs Détectés'}
+            <div className="stat-card__header">
+              <span className="stat-card__label">
+                {wolofMode ? 'Moytul / Fàcc' : 'Faux Départs Détectés'}
+              </span>
+              <div className="stat-card__icon" style={{ background: 'var(--clr-or-light)', color: 'var(--clr-or)' }}>
+                <IconWarning size={16} />
+              </div>
             </div>
-            <div className="stat-card__value" style={{ color: '#E8B04A' }}>
+            <div className="stat-card__value" style={{ color: 'var(--clr-or)' }}>
               {kpiStats.probableCount}
             </div>
-            <div className="stat-card__desc">Séquence sèche critique ≥ 8j post-semis</div>
+            <div className="stat-card__desc">Séquence sèche critique ≥ 8 jours</div>
           </div>
 
           <div className="stat-card">
-            <div className="stat-card__label">
-              {wolofMode ? 'Moyenne taw bi' : 'Pluie Moy. Déclenchement'}
+            <div className="stat-card__header">
+              <span className="stat-card__label">
+                {wolofMode ? 'Moyenne taw bi' : 'Pluie Moy. Déclenchement'}
+              </span>
+              <div className="stat-card__icon">
+                <IconRain size={16} />
+              </div>
             </div>
-            <div className="stat-card__value">{kpiStats.avgCumul} mm</div>
-            <div className="stat-card__desc">Cumul 3 jours consécutifs</div>
+            <div className="stat-card__value">{kpiStats.avgCumul} <span style={{ fontSize: '1.1rem', fontWeight: 600 }}>mm</span></div>
+            <div className="stat-card__desc">Cumul sur 3 jours consécutifs</div>
           </div>
         </div>
       </section>
 
       {/* Filter and Control Bar */}
       <div className="card control-bar" style={{ margin: '1.25rem 0', padding: '0.85rem 1.25rem' }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.85rem', alignItems: 'center', justifyContent: 'space-between' }}>
           {/* Search bar */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: '1 1 240px' }}>
-            <span style={{ color: 'var(--fg-muted)' }}>🔍</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: '1 1 240px', position: 'relative' }}>
+            <span style={{ position: 'absolute', left: '12px', color: 'var(--fg-muted)', display: 'flex' }}>
+              <IconSearch size={16} />
+            </span>
             <input
               type="text"
-              className="input-search"
-              placeholder={wolofMode ? 'Wër benn koos...' : 'Rechercher un secteur ou commune...'}
+              placeholder={wolofMode ? 'Wër benn koos...' : 'Rechercher un secteur, une commune...'}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{
                 width: '100%',
-                padding: '0.45rem 0.8rem',
+                padding: '0.55rem 0.85rem 0.55rem 2.4rem',
                 borderRadius: '8px',
                 border: '1px solid var(--border)',
                 background: 'var(--bg)',
                 color: 'var(--fg)',
-                fontSize: '0.9rem',
+                fontSize: '0.88rem',
+                outline: 'none',
               }}
             />
           </div>
 
           {/* Status buttons */}
-          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
             <button
               className={`btn btn--sm ${statusFilter === 'all' ? 'btn--primary' : 'btn--secondary'}`}
               onClick={() => setStatusFilter('all')}
@@ -191,15 +223,16 @@ export const MapView: React.FC<MapViewProps> = ({
             <button
               className={`btn btn--sm ${statusFilter === 'signature_probable' ? 'btn--primary' : 'btn--secondary'}`}
               onClick={() => setStatusFilter('signature_probable')}
-              style={{ borderColor: 'rgba(232, 176, 74, 0.6)' }}
             >
-              ⚠️ Faux départs ({kpiStats.probableCount})
+              <IconWarning size={14} />
+              <span>Faux départs ({kpiStats.probableCount})</span>
             </button>
             <button
               className={`btn btn--sm ${statusFilter === 'pas_de_signature' ? 'btn--primary' : 'btn--secondary'}`}
               onClick={() => setStatusFilter('pas_de_signature')}
             >
-              ✅ Semis normal ({kpiStats.normalCount})
+              <IconCheck size={14} />
+              <span>Semis normal ({kpiStats.normalCount})</span>
             </button>
           </div>
 
@@ -210,14 +243,16 @@ export const MapView: React.FC<MapViewProps> = ({
               onClick={() => setViewMode('carte')}
               title="Affichage Carte"
             >
-              🗺️ {wolofMode ? 'Nataal' : 'Carte'}
+              <IconMap size={14} />
+              <span>{wolofMode ? 'Nataal' : 'Carte'}</span>
             </button>
             <button
               className={`btn btn--sm ${viewMode === 'grille' ? 'btn--primary' : 'btn--secondary'}`}
               onClick={() => setViewMode('grille')}
               title="Affichage Grille"
             >
-              📋 {wolofMode ? 'Limm' : 'Grille'}
+              <IconGrid size={14} />
+              <span>{wolofMode ? 'Limm' : 'Grille'}</span>
             </button>
           </div>
         </div>
@@ -233,7 +268,7 @@ export const MapView: React.FC<MapViewProps> = ({
             borderRadius: '16px',
             overflow: 'hidden',
             border: '1px solid var(--border)',
-            background: 'linear-gradient(180deg, rgba(31,92,58,0.03) 0%, rgba(232,176,74,0.03) 100%)',
+            background: 'var(--bg-subtle)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -242,37 +277,37 @@ export const MapView: React.FC<MapViewProps> = ({
           {/* SVG Vector Choropleth Map */}
           <svg
             viewBox="0 0 800 620"
-            style={{ width: '100%', height: '100%', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.06))' }}
+            style={{ width: '100%', height: '100%' }}
           >
-            {/* Background Map Grid */}
+            {/* Background Subtly Textured Grid */}
             <defs>
               <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(31,92,58,0.06)" strokeWidth="1" />
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(22, 78, 49, 0.04)" strokeWidth="1" />
               </pattern>
             </defs>
             <rect width="100%" height="100%" fill="url(#grid)" />
 
             {/* Sectors Polygons */}
-            {svgPolygons.map(({ id, path, res, properties }) => {
+            {svgPolygons.map(({ id, path, res }) => {
               const isSelected = selectedSectorId === id
               const isProbable = res?.statut === 'signature_probable'
               const isExamine = res?.statut === 'baisse_a_examiner'
               const isNormal = res?.statut === 'pas_de_signature'
 
               const fillColor = isProbable
-                ? '#E8B04A'
+                ? '#D97706'
                 : isExamine
-                ? '#F4A261'
+                ? '#EA580C'
                 : isNormal
-                ? '#10B981'
-                : '#9CA3AF'
+                ? '#15803D'
+                : '#64748B'
 
               const opacity =
                 statusFilter === 'all'
-                  ? 0.72
+                  ? 0.78
                   : res?.statut === statusFilter
-                  ? 0.85
-                  : 0.2
+                  ? 0.92
+                  : 0.15
 
               return (
                 <path
@@ -280,8 +315,8 @@ export const MapView: React.FC<MapViewProps> = ({
                   d={path}
                   fill={fillColor}
                   fillOpacity={opacity}
-                  stroke={isSelected ? '#1F5C3A' : 'rgba(255,255,255,0.85)'}
-                  strokeWidth={isSelected ? 3 : 1.2}
+                  stroke={isSelected ? '#0F172A' : '#FFFFFF'}
+                  strokeWidth={isSelected ? 2.8 : 1}
                   style={{
                     cursor: 'pointer',
                     transition: 'all 150ms ease',
@@ -312,7 +347,7 @@ export const MapView: React.FC<MapViewProps> = ({
                 top: tooltipPos.y - 110,
                 left: tooltipPos.x + 15,
                 zIndex: 1000,
-                background: 'rgba(27, 42, 34, 0.95)',
+                background: 'rgba(15, 23, 42, 0.95)',
                 color: '#FFFFFF',
                 padding: '0.65rem 0.9rem',
                 borderRadius: '8px',
@@ -326,11 +361,11 @@ export const MapView: React.FC<MapViewProps> = ({
               <div style={{ fontWeight: 700, fontSize: '0.88rem', color: '#8FD18A', marginBottom: '0.2rem' }}>
                 {hoveredSector.nom}
               </div>
-              <div>📍 Commune : <strong>{hoveredSector.commune}</strong></div>
-              <div>📅 Semis : <strong>{hoveredSector.season_start_date || 'Non détecté'}</strong></div>
-              <div>⏳ Séquence sèche : <strong>{hoveredSector.max_dry_days} jours</strong></div>
-              <div style={{ marginTop: '0.35rem', paddingTop: '0.35rem', borderTop: '1px solid rgba(255,255,255,0.2)', fontSize: '0.75rem', color: '#E8B04A' }}>
-                👉 Cliquer pour ouvrir la fiche détaillée
+              <div>Commune : <strong>{hoveredSector.commune}</strong></div>
+              <div>Semis : <strong>{hoveredSector.season_start_date || 'Non détecté'}</strong></div>
+              <div>Séquence sèche : <strong>{hoveredSector.max_dry_days} jours</strong></div>
+              <div style={{ marginTop: '0.35rem', paddingTop: '0.35rem', borderTop: '1px solid rgba(255,255,255,0.2)', fontSize: '0.74rem', color: '#E8B04A' }}>
+                Cliquer pour ouvrir la fiche détaillée
               </div>
             </div>
           )}
@@ -340,38 +375,38 @@ export const MapView: React.FC<MapViewProps> = ({
             className="card floating-legend"
             style={{
               position: 'absolute',
-              bottom: '20px',
-              left: '20px',
+              bottom: '18px',
+              left: '18px',
               zIndex: 10,
               maxWidth: '300px',
-              padding: '0.85rem',
+              padding: '0.85rem 1rem',
               background: 'var(--bg-card)',
-              boxShadow: 'var(--shadow-md)',
+              boxShadow: 'var(--shadow-card)',
             }}
           >
-            <div style={{ fontWeight: 700, fontSize: '0.85rem', marginBottom: '0.5rem', color: 'var(--clr-vert-semis)' }}>
-              {wolofMode ? 'Melokaanoo yi' : 'Légende Statut Semis'}
+            <div style={{ fontWeight: 700, fontSize: '0.82rem', marginBottom: '0.5rem', color: 'var(--clr-vert-semis)' }}>
+              {wolofMode ? 'Melokaanoo yi' : 'Statut de la Campagne'}
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', fontSize: '0.78rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', fontSize: '0.76rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ width: '14px', height: '14px', borderRadius: '3px', background: '#10B981', display: 'inline-block' }} />
+                <span style={{ width: '12px', height: '12px', borderRadius: '3px', background: '#15803D', display: 'inline-block' }} />
                 <span>Semis normal (aucun faux départ)</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ width: '14px', height: '14px', borderRadius: '3px', background: '#E8B04A', display: 'inline-block' }} />
-                <span>Signature de faux départ probable</span>
+                <span style={{ width: '12px', height: '12px', borderRadius: '3px', background: '#D97706', display: 'inline-block' }} />
+                <span>Faux départ probable (pause hydrique ≥ 8j)</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ width: '14px', height: '14px', borderRadius: '3px', background: '#F4A261', display: 'inline-block' }} />
+                <span style={{ width: '12px', height: '12px', borderRadius: '3px', background: '#EA580C', display: 'inline-block' }} />
                 <span>Baisse NDVI à examiner</span>
               </div>
             </div>
           </div>
 
           {/* Map Controls */}
-          <div style={{ position: 'absolute', top: '15px', right: '15px', zIndex: 10, display: 'flex', gap: '0.5rem' }}>
+          <div style={{ position: 'absolute', top: '15px', right: '15px', zIndex: 10 }}>
             <span className="badge badge--real" style={{ background: 'var(--bg-card)' }}>
-              100 Secteurs géolocalisés (Kaffrine)
+              Bassin arachidier • 100 Secteurs
             </span>
           </div>
         </div>
@@ -381,16 +416,15 @@ export const MapView: React.FC<MapViewProps> = ({
           {filteredResults.map((sec) => (
             <div
               key={sec.sector_id}
-              className="card sector-preview-card"
+              className="card card--interactive sector-preview-card"
               onClick={() => setSelectedSectorId(sec.sector_id)}
               style={{
-                cursor: 'pointer',
-                borderLeft: `5px solid ${
+                borderLeft: `4px solid ${
                   sec.statut === 'signature_probable'
-                    ? '#E8B04A'
+                    ? '#D97706'
                     : sec.statut === 'baisse_a_examiner'
-                    ? '#F4A261'
-                    : '#10B981'
+                    ? '#EA580C'
+                    : '#15803D'
                 }`,
               }}
             >
@@ -428,7 +462,7 @@ export const MapView: React.FC<MapViewProps> = ({
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginTop: '0.25rem' }}>
                 <span>Séquence sèche :</span>
-                <strong style={{ color: sec.dry_is_critical ? '#EF4444' : 'inherit' }}>
+                <strong style={{ color: sec.dry_is_critical ? 'var(--clr-alerte)' : 'inherit' }}>
                   {sec.max_dry_days} jours
                 </strong>
               </div>

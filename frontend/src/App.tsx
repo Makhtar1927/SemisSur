@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Navbar } from './components/Navbar'
+import { BrandLogo } from './components/BrandLogo'
 import { MapView } from './components/MapView'
 import { HistoryView } from './components/HistoryView'
 import { SimulatorView } from './components/SimulatorView'
@@ -148,23 +149,19 @@ export const App: React.FC = () => {
       </main>
 
       {/* Footer */}
-      <footer className="footer" style={{ borderTop: '1px solid var(--border)', padding: '2rem 1.5rem', background: 'var(--bg-card)', marginTop: '4rem' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
+      <footer className="footer" style={{ borderTop: '1px solid var(--border)', padding: '2.5rem 1.5rem', background: 'var(--bg-card)', marginTop: '4rem' }}>
+        <div style={{ maxWidth: '1320px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '1.5rem' }}>
           <div>
-            <div style={{ fontWeight: 700, color: 'var(--clr-vert-semis)' }}>
-              SemisSûr — Plateforme Agro-Climatique
-            </div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--fg-muted)', marginTop: '0.2rem' }}>
-              Projet développé dans le cadre du Hackathon SENSAT 2026 • Kaolack / Kaffrine
+            <BrandLogo size="sm" showTagline={true} />
+            <div style={{ fontSize: '0.8rem', color: 'var(--fg-muted)', marginTop: '0.45rem', maxWidth: '420px' }}>
+              Le satellite au service des semis, du bassin arachidier à tout le Sénégal. Développé pour le Hackathon National SENSAT 2026.
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '1rem', fontSize: '0.82rem', color: 'var(--fg-muted)' }}>
-            <span>CHIRPS Daily v2.0</span>
-            <span>•</span>
-            <span>Sentinel-2 L2A</span>
-            <span>•</span>
-            <span>Sivakumar (1988)</span>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', fontSize: '0.82rem', color: 'var(--fg-muted)', alignItems: 'center' }}>
+            <span className="badge badge--real">CHIRPS Daily v2.0 (0.05°)</span>
+            <span className="badge badge--real">Sentinel-2 L2A (10m)</span>
+            <span className="badge badge--real">Critères Sivakumar (1988)</span>
           </div>
         </div>
       </footer>
