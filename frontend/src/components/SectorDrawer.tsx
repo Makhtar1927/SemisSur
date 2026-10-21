@@ -287,6 +287,49 @@ export const SectorDrawer: React.FC<SectorDrawerProps> = ({
             </div>
           </div>
 
+          {/* Module 3 : Réparer — Niveau d'Urgence & Déclencheur Action */}
+          <div
+            style={{
+              padding: '0.9rem 1.1rem',
+              borderRadius: '12px',
+              marginBottom: '1.25rem',
+              border: `1px solid ${
+                sector.statut === 'signature_probable'
+                  ? 'rgba(217, 119, 6, 0.4)'
+                  : sector.statut === 'baisse_a_examiner'
+                  ? 'rgba(234, 88, 12, 0.4)'
+                  : 'rgba(21, 128, 61, 0.3)'
+              }`,
+              background:
+                sector.statut === 'signature_probable'
+                  ? 'var(--clr-or-light)'
+                  : sector.statut === 'baisse_a_examiner'
+                  ? '#FFEDD5'
+                  : 'var(--clr-vert-light)',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <span style={{ fontSize: '0.78rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: sector.statut === 'signature_probable' ? '#B45309' : sector.statut === 'baisse_a_examiner' ? '#C2410C' : '#15803D' }}>
+                Module 3 • Réparer
+              </span>
+              <span className={`pill ${sector.statut === 'signature_probable' ? 'pill--probable' : sector.statut === 'baisse_a_examiner' ? 'pill--examine' : 'pill--aucune'}`} style={{ fontSize: '0.74rem' }}>
+                {sector.statut === 'signature_probable'
+                  ? 'Niveau Sévère • Priorité 1'
+                  : sector.statut === 'baisse_a_examiner'
+                  ? 'Niveau Modéré • Priorité 2'
+                  : 'Niveau Faible • Surveillance Normale'}
+              </span>
+            </div>
+            <div style={{ fontSize: '0.84rem', lineHeight: '1.45', color: 'var(--fg)' }}>
+              <strong>Déclencheur d'Action Institutionnelle :</strong>{' '}
+              {sector.statut === 'signature_probable'
+                ? 'Dossier de preuve pour semences de ressemis d’urgence (Ministère / DAPSA) et ouverture de constat de sinistre indiciel (CNAAS).'
+                : sector.statut === 'baisse_a_examiner'
+                ? 'Visite de terrain ciblée demandée au conseiller agricole (ANCAR) pour vérifier le taux de levée.'
+                : 'Conditions normales. Aucune intervention requise.'}
+            </div>
+          </div>
+
           {/* Bilingual Farmer Advice Box */}
           <div className="card" style={{ background: 'var(--bg-subtle)', borderLeft: '4px solid var(--clr-vert-semis)', marginBottom: '1.25rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
@@ -306,7 +349,7 @@ export const SectorDrawer: React.FC<SectorDrawerProps> = ({
               </button>
             </div>
 
-            <p style={{ fontSize: '0.88rem', lineHeight: '1.5', color: 'var(--fg)' }}>
+            <p style={{ fontSize: '0.88rem', lineHeight: '1.5', color: 'var(--fg)', marginBottom: '0.85rem' }}>
               {wolofMode ? (
                 sector.statut === 'signature_probable' ? (
                   <>
@@ -332,6 +375,18 @@ export const SectorDrawer: React.FC<SectorDrawerProps> = ({
                 )
               )}
             </p>
+
+            {/* Simulated SMS Broadcast Message (Dossier Hackathon Section 8) */}
+            <div style={{ background: 'var(--bg-card)', border: '1px dashed var(--border)', borderRadius: '8px', padding: '0.7rem 0.85rem', fontSize: '0.78rem' }}>
+              <div style={{ fontWeight: 700, color: 'var(--fg-muted)', marginBottom: '0.2rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <span>📱 Message SMS / Radio diffusé aux producteurs ({sector.commune}) :</span>
+              </div>
+              <div style={{ fontStyle: 'italic', color: 'var(--fg-secondary)' }}>
+                {sector.statut === 'signature_probable'
+                  ? `« SemisSûr Alerte [${sector.nom}] : ${sector.max_dry_days} jours sans pluie utile après votre semis du ${sector.season_start_date}. Si les plants sèchent, préparez le ressemis et contactez le conseiller ANCAR. »`
+                  : `« SemisSûr Info [${sector.nom}] : Déclenchement validé (${sector.season_trigger_mm} mm). Reprise normale observée par satellite. Poursuivez l'entretien standard. »`}
+              </div>
+            </div>
           </div>
 
           {/* Chart 1: Rainfall & Cumulative */}

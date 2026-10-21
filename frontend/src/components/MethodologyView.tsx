@@ -6,6 +6,7 @@ import {
   IconLeaf,
   IconDownload,
   IconWarning,
+  IconInfo,
 } from './Icons'
 
 interface MethodologyViewProps {
@@ -139,6 +140,100 @@ export const MethodologyView: React.FC<MethodologyViewProps> = ({
               </tr>
             </tbody>
           </table>
+        </div>
+      </div>
+
+      {/* Stakeholders & Decision Matrix (Section 4 du Dossier Candidature) */}
+      <div className="card" style={{ marginBottom: '1.5rem' }}>
+        <h3 className="card__title">
+          <IconInfo size={18} />
+          <span>Qui Utilise SemisSûr & Pour Quelle Décision ?</span>
+        </h3>
+        <p style={{ fontSize: '0.86rem', color: 'var(--fg-muted)', marginBottom: '1rem' }}>
+          Conformité avec les acteurs institutionnels sénégalais associés au Hackathon SENSAT :
+        </p>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.84rem', textAlign: 'left' }}>
+            <thead>
+              <tr style={{ borderBottom: '2px solid var(--border)', color: 'var(--fg-muted)' }}>
+                <th style={{ padding: '0.75rem' }}>Acteur / Institution</th>
+                <th style={{ padding: '0.75rem' }}>Ce qu'il reçoit</th>
+                <th style={{ padding: '0.75rem' }}>Décision Préparée & Action Concrète</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                <td style={{ padding: '0.75rem', fontWeight: 600, color: 'var(--clr-vert-semis)' }}>
+                  Conseiller Agricole & Coopératives (ANCAR)
+                </td>
+                <td style={{ padding: '0.75rem' }}>Tableau de bord par zone & alertes de pause sèche</td>
+                <td style={{ padding: '0.75rem' }}>Identifier les villages à visiter en priorité, conseiller de semer ou d'attendre.</td>
+              </tr>
+              <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                <td style={{ padding: '0.75rem', fontWeight: 600, color: 'var(--clr-vert-semis)' }}>
+                  Agriculteurs & Producteurs
+                </td>
+                <td style={{ padding: '0.75rem' }}>Message simple vocal ou SMS en Wolof et Français</td>
+                <td style={{ padding: '0.75rem' }}>Semer immédiatement ou temporiser ; vérifier le taux de levée en cas de pause sèche.</td>
+              </tr>
+              <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                <td style={{ padding: '0.75rem', fontWeight: 600, color: 'var(--clr-vert-semis)' }}>
+                  Ministère de l'Agriculture (DAPSA / DPV)
+                </td>
+                <td style={{ padding: '0.75rem' }}>Cartographie objective des pertes de début de saison</td>
+                <td style={{ padding: '0.75rem' }}>Cibler l'envoi de semences de ressemis en urgence sans attendre les enquêtes tardives.</td>
+              </tr>
+              <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                <td style={{ padding: '0.75rem', fontWeight: 600, color: 'var(--clr-vert-semis)' }}>
+                  Assurance Agricole Indicielle (CNAAS)
+                </td>
+                <td style={{ padding: '0.75rem' }}>Indice objectif et vérifiable de sinistre par maille</td>
+                <td style={{ padding: '0.75rem' }}>Valider et déclencher plus rapidement l'indemnisation ou l'aide post-sinistre.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* United Nations Sustainable Development Goals (ODD) Section 9 */}
+      <div className="card" style={{ marginBottom: '1.5rem' }}>
+        <h3 className="card__title">
+          <IconBook size={18} />
+          <span>Contribution aux Objectifs de Développement Durable (Agenda 2030)</span>
+        </h3>
+        <div className="grid grid--3" style={{ gap: '1rem', marginTop: '1rem' }}>
+          <div style={{ padding: '1rem', borderRadius: '12px', background: 'var(--bg-subtle)', border: '1px solid var(--border)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
+              <span style={{ background: '#DDA63A', color: '#FFFFFF', padding: '0.2rem 0.5rem', borderRadius: '4px', fontWeight: 800, fontSize: '0.75rem' }}>ODD 2</span>
+              <strong style={{ fontSize: '0.88rem' }}>Faim « Zéro »</strong>
+            </div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--clr-vert-semis)', fontWeight: 700, marginBottom: '0.3rem' }}>Cibles 2.3 & 2.4</div>
+            <p style={{ fontSize: '0.82rem', color: 'var(--fg-muted)', lineHeight: '1.45' }}>
+              Sécurisation des rendements d'arachide et céréales vivrières en éliminant les pertes de semences et en accélérant les réapprovisionnements.
+            </p>
+          </div>
+
+          <div style={{ padding: '1rem', borderRadius: '12px', background: 'var(--bg-subtle)', border: '1px solid var(--border)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
+              <span style={{ background: '#3F7E44', color: '#FFFFFF', padding: '0.2rem 0.5rem', borderRadius: '4px', fontWeight: 800, fontSize: '0.75rem' }}>ODD 13</span>
+              <strong style={{ fontSize: '0.88rem' }}>Action Climatique</strong>
+            </div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--clr-vert-semis)', fontWeight: 700, marginBottom: '0.3rem' }}>Cible 13.1</div>
+            <p style={{ fontSize: '0.82rem', color: 'var(--fg-muted)', lineHeight: '1.45' }}>
+              Renforcement de la résilience face à l'irrégularité accrue des moussons sahéliennes par la surveillance satellitaire objective des faux départs.
+            </p>
+          </div>
+
+          <div style={{ padding: '1rem', borderRadius: '12px', background: 'var(--bg-subtle)', border: '1px solid var(--border)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
+              <span style={{ background: '#E5243B', color: '#FFFFFF', padding: '0.2rem 0.5rem', borderRadius: '4px', fontWeight: 800, fontSize: '0.75rem' }}>ODD 1</span>
+              <strong style={{ fontSize: '0.88rem' }}>Pas de Pauvreté</strong>
+            </div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--clr-vert-semis)', fontWeight: 700, marginBottom: '0.3rem' }}>Cible 1.5</div>
+            <p style={{ fontSize: '0.82rem', color: 'var(--fg-muted)', lineHeight: '1.45' }}>
+              Protection des petits exploitants contre le surendettement lié au rachat imprévu de semences grâce à des preuves de sinistre certifiées.
+            </p>
+          </div>
         </div>
       </div>
 
